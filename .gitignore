@@ -1,0 +1,15 @@
+# R / renv
+.Rhistory
+.RData
+.Rproj.user/
+
+renv/library/
+renv/staging/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.log
+*.tmp

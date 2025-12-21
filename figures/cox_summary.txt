@@ -1,0 +1,25 @@
+Call:
+coxph(formula = Surv(time, event) ~ Department + OverTime + YearsSinceLastPromotion, 
+    data = df_model, model = TRUE, x = TRUE)
+
+  n= 1470, number of events= 237 
+
+                                     coef exp(coef) se(coef)      z Pr(>|z|)    
+DepartmentResearch & Development -0.09273   0.91144  0.30483 -0.304    0.761    
+DepartmentSales                   0.26527   1.30378  0.30976  0.856    0.392    
+OverTimeYes                       1.12225   3.07175  0.13073  8.584  < 2e-16 ***
+YearsSinceLastPromotion          -0.14093   0.86855  0.02409 -5.850 4.91e-09 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+                                 exp(coef) exp(-coef) lower .95 upper .95
+DepartmentResearch & Development    0.9114     1.0972    0.5015    1.6565
+DepartmentSales                     1.3038     0.7670    0.7105    2.3926
+OverTimeYes                         3.0718     0.3255    2.3774    3.9689
+YearsSinceLastPromotion             0.8686     1.1513    0.8285    0.9105
+
+Concordance= 0.74  (se = 0.015 )
+Likelihood ratio test= 123.9  on 4 df,   p=<2e-16
+Wald test            = 116.3  on 4 df,   p=<2e-16
+Score (logrank) test = 126.8  on 4 df,   p=<2e-16
+

@@ -1,0 +1,5 @@
+                         chisq df       p
+Department               2.847  2    0.24
+OverTime                 0.618  1    0.43
+YearsSinceLastPromotion 40.689  1 1.8e-10
+GLOBAL                  42.537  4 1.3e-08
