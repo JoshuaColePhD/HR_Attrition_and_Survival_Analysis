@@ -1,12 +1,35 @@
-# 📊 Employee Attrition Survival Analysis (IBM HR Dataset)
+# 📊 Executive Attrition Risk Dashboard + Survival Analysis
 
-**Tools:** R · survival · survminer · ggplot2
+**Tools:** Next.js · TypeScript · Tailwind CSS · Recharts · R · survival · survminer · ggplot2
 
 ## Overview
 
-This project applies **survival analysis** to model employee attrition over time using IBM HR data. Rather than treating attrition as a simple yes/no outcome, the analysis explicitly accounts for **time-to-exit** and **censoring** (employees still employed at last observation).
+This project combines an **executive-facing attrition risk dashboard** with an underlying **survival analysis workflow** using IBM HR data. The dashboard translates attrition signals into business-ready, ethical retention guidance for managers, HR leaders, and executives, while the R analysis pipeline provides the statistical foundation through Kaplan-Meier and Cox proportional hazards modeling.
 
-The workflow progresses from **exploratory survival analysis** using Kaplan–Meier curves to **multivariable modeling** with a Cox proportional hazards model, supported by interpretable visualizations and diagnostics.
+Rather than treating attrition as a simple yes/no outcome, the analysis explicitly accounts for **time-to-exit** and **censoring** (employees still employed at last observation). The workflow progresses from **exploratory survival analysis** to **multivariable modeling**, then into an interactive dashboard that supports executive review, segment drilldown, and scenario-based retention planning.
+
+---
+
+## Dashboard
+
+The Next.js dashboard is designed for **Executives / HR** and focuses on aggregated decision support rather than employee-level surveillance.
+
+### What the dashboard includes
+
+- **Summary view** with key KPIs, prioritized actions, cautions, and monitoring suggestions
+- **Risk Patterns view** with segment comparisons, population mix, survival curves, and concentration tables
+- **Model + Scenarios view** with Cox model driver interpretation and aggregate what-if planning
+- **Global filters** for department, role family, overtime, tenure band, promotion band, travel, and satisfaction/work-life bands
+- **Ethical guardrails** that keep recommendations supportive, aggregated, and risk-informed rather than deterministic
+
+### Run the dashboard locally
+
+```bash
+npm install
+npm run dev
+```
+
+Then open [http://localhost:3000](http://localhost:3000).
 
 ---
 
@@ -55,8 +78,17 @@ Employees who had not left the company by the end of the observation period are 
 
 ```text
 HR_Attrition/
+├── app/
+│   ├── api/dashboard/route.ts
+│   ├── layout.tsx
+│   └── page.tsx
+├── components/
+│   └── dashboard-view.tsx
 ├── data/
 │   └── IBM-HR-Employee-Attrition.csv
+├── lib/
+│   ├── dashboard-data.ts
+│   └── types.ts
 ├── outputs/
 │   └── hr_survival_df.rds
 ├── figures/
@@ -72,6 +104,9 @@ HR_Attrition/
 │   ├── 01_data_prep.R
 │   ├── 02_survival_eda.R
 │   └── 03_cox_model.R
+├── tests/
+│   ├── dashboard-data.test.ts
+│   └── dashboard-view.test.tsx
 └── README.md
 ```
 
@@ -163,6 +198,18 @@ Survival analysis provides:
 - Scripts use relative paths and can be run end-to-end from the project root
 - Outputs are deterministic given the input dataset
 - Figures and model summaries are saved to disk for review
+- The dashboard reads the prepared dataset and model outputs at runtime through a single internal data interface
+
+---
+
+## Development Checks
+
+```bash
+npm test
+npm run build
+```
+
+These validate the dashboard transforms, tabbed UI behavior, URL state persistence, and production build integrity.
 
 ---
 

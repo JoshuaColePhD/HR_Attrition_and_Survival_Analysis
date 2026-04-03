@@ -13,3 +13,8 @@ Thumbs.db
 # Temporary files
 *.log
 *.tmp
+
+# Next.js / Node
+node_modules/
+.next/
+coverage/
