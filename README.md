@@ -88,6 +88,45 @@ If these columns are missing, the dashboard now fails with a clear data-contract
 - Another user can reproduce the R environment with `renv::restore()` once the lockfile is present.
 - Another user can use their own HR data **only if** they map it into the same prepared schema or extend the loader accordingly.
 
+### Map a custom HR export into the dashboard schema
+
+An example mapping template is included at `config/custom_data_mapping.example.csv`.
+
+Workflow:
+
+1. Copy the example mapping file and replace the `source` column values with the column names from your HR export.
+2. Run the mapping script:
+
+```bash
+Rscript R/01_map_custom_data.R path/to/your_hr_export.csv config/custom_data_mapping.example.csv
+```
+
+3. The script writes:
+   - `outputs/hr_survival_df.csv`
+   - `outputs/hr_survival_df.rds`
+
+4. Then run the dashboard:
+
+```bash
+npm run dev
+```
+
+Or regenerate the R figures/model outputs with:
+
+```bash
+Rscript R/02_survival_eda.R
+Rscript R/03_cox_model.R
+```
+
+The mapping script currently supports these transform types:
+
+- `text`
+- `numeric`
+- `yes_no`
+- `event_yes_no`
+- `derive_event`
+- `derive_time`
+
 ---
 
 ## Key Results at a Glance
@@ -141,6 +180,8 @@ HR_Attrition/
 │   └── page.tsx
 ├── components/
 │   └── dashboard-view.tsx
+├── config/
+│   └── custom_data_mapping.example.csv
 ├── data/
 │   └── IBM-HR-Employee-Attrition.csv
 ├── lib/
@@ -158,6 +199,7 @@ HR_Attrition/
 │   └── cox_ph_diagnostics.pdf
 ├── R/
 │   ├── 00_setup.R
+│   ├── 01_map_custom_data.R
 │   ├── 01_data_prep.R
 │   ├── 02_survival_eda.R
 │   └── 03_cox_model.R

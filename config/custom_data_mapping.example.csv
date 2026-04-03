@@ -1,0 +1,13 @@
+target,source,transform,notes
+Age,Age,numeric,Employee age
+Department,Department,text,Business unit or department
+JobRole,JobRole,text,Role label used in segment views
+OverTime,OverTime,yes_no,Standardized to Yes/No
+BusinessTravel,BusinessTravel,text,Travel category label
+JobSatisfaction,JobSatisfaction,numeric,Expected 1-4 style score
+WorkLifeBalance,WorkLifeBalance,numeric,Expected 1-4 style score
+YearsAtCompany,YearsAtCompany,numeric,Used for tenure displays and time derivation
+YearsSinceLastPromotion,YearsSinceLastPromotion,numeric,Used in model and banding
+Attrition,Attrition,yes_no,Used to derive event if needed
+event,,derive_event,Derived from mapped Attrition
+time,,derive_time,Derived from mapped YearsAtCompany
