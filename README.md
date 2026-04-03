@@ -33,6 +33,63 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 ---
 
+## Reproducibility
+
+The repository is designed to be reproducible in two layers:
+
+- **Dashboard runtime**: reproducible through `package-lock.json` and local checked-in outputs
+- **R analysis workflow**: reproducible through `renv.lock` and the scripts in `R/`
+
+### Reproduce the dashboard
+
+```bash
+npm install
+npm run dev
+```
+
+This works as-is because the dashboard reads local prepared files in `outputs/` and model artifacts in `figures/`.
+
+### Reproduce the R analysis environment
+
+```r
+source("renv/activate.R")
+renv::restore()
+```
+
+Then run the scripts in order:
+
+1. `R/01_load_data.R`
+2. `R/02_survival_eda.R`
+3. `R/03_cox_model.R`
+
+### What is required for custom data
+
+The current dashboard is **portable**, but it is not schema-agnostic. A replacement dataset must preserve the fields used by the dashboard and analysis outputs.
+
+Minimum required columns in `outputs/hr_survival_df.csv`:
+
+- `Age`
+- `Department`
+- `JobRole`
+- `OverTime`
+- `BusinessTravel`
+- `JobSatisfaction`
+- `WorkLifeBalance`
+- `YearsAtCompany`
+- `YearsSinceLastPromotion`
+- `event`
+- `time`
+
+If these columns are missing, the dashboard now fails with a clear data-contract error instead of silently breaking.
+
+### What this means in practice
+
+- Another user can clone the repo and run the dashboard locally with the included prepared data.
+- Another user can reproduce the R environment with `renv::restore()` once the lockfile is present.
+- Another user can use their own HR data **only if** they map it into the same prepared schema or extend the loader accordingly.
+
+---
+
 ## Key Results at a Glance
 
 - **Sample size:** 1,470 employees  

@@ -36,6 +36,19 @@ type EmployeeRecord = {
 const DATA_FILE = path.join(process.cwd(), "outputs", "hr_survival_df.csv");
 const COX_SUMMARY_FILE = path.join(process.cwd(), "figures", "cox_summary.txt");
 const COX_PH_TEST_FILE = path.join(process.cwd(), "figures", "cox_ph_test.txt");
+const REQUIRED_INPUT_COLUMNS = [
+  "Age",
+  "Department",
+  "JobRole",
+  "OverTime",
+  "BusinessTravel",
+  "JobSatisfaction",
+  "WorkLifeBalance",
+  "YearsAtCompany",
+  "YearsSinceLastPromotion",
+  "event",
+  "time",
+] as const;
 
 const ALL = "all";
 
@@ -116,6 +129,14 @@ async function loadRecords() {
   const raw = await fs.readFile(DATA_FILE, "utf8");
   const [headerLine, ...rows] = raw.trim().split(/\r?\n/);
   const headers = splitCsvLine(headerLine);
+  const missingColumns = REQUIRED_INPUT_COLUMNS.filter((column) => !headers.includes(column));
+
+  if (missingColumns.length > 0) {
+    throw new Error(
+      `Dashboard input is missing required columns: ${missingColumns.join(", ")}. ` +
+        "Update outputs/hr_survival_df.csv to match the documented data contract in README.md.",
+    );
+  }
 
   cachedRecords = rows.map((row) => {
     const values = splitCsvLine(row);

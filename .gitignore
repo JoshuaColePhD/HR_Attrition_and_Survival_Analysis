@@ -18,3 +18,5 @@ Thumbs.db
 node_modules/
 .next/
 coverage/
+.idea/
+.venv/
