@@ -4,9 +4,12 @@
 # Author:      Joshua Cole
 # ============================================================
 
-library(tidyverse)
-library(survival)
-library(survminer)
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(survival))
+suppressPackageStartupMessages(library(survminer))
+
+# Keep captured model summaries stable across terminals and CI environments.
+options(width = 120)
 
 # ---- Load dataset ----
 df <- readRDS("outputs/hr_survival_df.rds")
@@ -32,14 +35,17 @@ dir.create("figures", showWarnings = FALSE, recursive = TRUE)
 # 1) Fit Cox proportional hazards model
 # ============================================================
 
-# Make types explicit
+# Make types explicit so model contrasts are stable across machines and reruns.
 df_model <- df %>%
   mutate(
     Department = droplevels(factor(Department)),
-    OverTime = droplevels(factor(OverTime)),
+    OverTime = droplevels(factor(OverTime, levels = c("No", "Yes"))),
     YearsSinceLastPromotion = as.numeric(YearsSinceLastPromotion)
   )
 
+# Keep the model compact and interpretable: these fields are available in most
+# HRIS exports and translate cleanly into workload, org-design, and career-path
+# decisions. This is decision support, not a causal claim about individual exits.
 cox_fit <- coxph(
   Surv(time, event) ~ Department + OverTime + YearsSinceLastPromotion,
   data = df_model,
@@ -78,13 +84,16 @@ forest_df <- tibble(
     )
   )
 
+write_csv(forest_df, "figures/cox_model_drivers.csv")
+message("Saved: figures/cox_model_drivers.csv")
+
 p_forest <- ggplot(
   forest_df,
   aes(x = hr, y = term, color = effect_type)
 ) +
   geom_vline(xintercept = 1, linetype = "dashed", color = "gray50") +
   geom_point(size = 3) +
-  geom_errorbarh(aes(xmin = lo, xmax = hi), height = 0.25) +
+  geom_errorbar(aes(xmin = lo, xmax = hi), width = 0.25, orientation = "y") +
   scale_x_log10() +
   scale_color_manual(
     values = c(
@@ -142,10 +151,16 @@ message("Saved: figures/cox_ph_diagnostics.pdf")
 # ============================================================
 # 4) Adjusted survival curves (example: OverTime Yes vs No)
 # ============================================================
+reference_department <- names(sort(table(df_model$Department), decreasing = TRUE))[1]
+reference_promotion <- median(df_model$YearsSinceLastPromotion, na.rm = TRUE)
+
+# Use the modal department and median promotion timing to make the comparison
+# read like a typical-employee scenario for executives. The only intended
+# difference between rows is overtime exposure.
 newdata_ot <- data.frame(
-  Department = "Human Resources",
-  OverTime = c("No", "Yes"),
-  YearsSinceLastPromotion = median(df_model$YearsSinceLastPromotion, na.rm = TRUE)
+  Department = factor(rep(reference_department, 2), levels = levels(df_model$Department)),
+  OverTime = factor(c("No", "Yes"), levels = levels(df_model$OverTime)),
+  YearsSinceLastPromotion = reference_promotion
 )
 
 sf_ot <- survfit(cox_fit, newdata = newdata_ot)

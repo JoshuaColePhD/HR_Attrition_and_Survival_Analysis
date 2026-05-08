@@ -85,4 +85,28 @@ describe("DashboardView", () => {
     await user.click(screen.getByRole("button", { name: "More filters" }));
     expect(screen.getByLabelText("Business Travel")).toBeInTheDocument();
   });
+
+  it("lets leaders interact with the overtime retention gap explorer", async () => {
+    const user = userEvent.setup();
+    render(<DashboardView initialPayload={latestPayload} />);
+
+    expect(screen.getByText("Overtime retention gap explorer")).toBeInTheDocument();
+    expect(screen.getByText(/Overtime HR 3.07/i)).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByLabelText("Overtime retention planning horizon"), "3");
+    expect(screen.getByText(/At 3 years/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Focus overtime" }));
+
+    await waitFor(() => {
+      expect(window.location.search).toContain("overTime=Yes");
+      expect(screen.getByText(/Current Overtime filter is Yes/i)).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: "Compare groups" }));
+
+    await waitFor(() => {
+      expect(window.location.search).not.toContain("overTime=Yes");
+    });
+  });
 });

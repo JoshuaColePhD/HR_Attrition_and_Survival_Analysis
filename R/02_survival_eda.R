@@ -4,9 +4,9 @@
 # Author:      Joshua Cole
 # ============================================================
 
-library(tidyverse)
-library(survival)
-library(survminer)
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(survival))
+suppressPackageStartupMessages(library(survminer))
 
 # ---- Load dataset ----
 df <- readRDS("outputs/hr_survival_df.rds")
@@ -31,6 +31,9 @@ summary_stats <- df %>%
 print(summary_stats)
 
 # ---- Create survival object ----
+# Surv() preserves partial tenure information for employees who have not left yet.
+# This is the core reason survival analysis is a better HR planning frame than a
+# binary attrition flag alone.
 surv_obj <- Surv(time = df$time, event = df$event)
 
 # Helper: show plots in the Plot panel when running interactively
@@ -38,7 +41,8 @@ show_plot <- function(p) {
   if (interactive()) print(p)
 }
 
-# Save plot panel
+# Save the main ggplot panel from survminer objects. Risk tables are displayed
+# interactively and can be exported separately if a full report needs them.
 save_plot <- function(p, filename, width = 9, height = 6) {
   ggsave(filename, plot = p$plot, width = width, height = height, units = "in")
   message("Saved: ", filename)
@@ -68,7 +72,10 @@ save_plot(p_overall, "figures/km_overall.pdf")
 # ============================================================
 if ("Department" %in% names(df)) {
   df_dept <- df %>% mutate(Department = factor(Department))
-  
+
+  # Department curves are useful for leadership accountability, but any visible
+  # separation should be interpreted as a prompt for diagnosis rather than as a
+  # causal department effect.
   km_dept <- survfit(Surv(time = df_dept$time, event = df_dept$event) ~ Department, data = df_dept)
   
   p_dept <- ggsurvplot(
@@ -97,7 +104,9 @@ if ("Department" %in% names(df)) {
 if ("OverTime" %in% names(df)) {
   df_ot <- df %>%
     mutate(OverTime = factor(OverTime, levels = c("No", "Yes")))
-  
+
+  # Overtime is the most decision-ready segmentation variable here: it maps
+  # directly to staffing, scheduling, and manager workload interventions.
   km_ot <- survfit(Surv(time = df_ot$time, event = df_ot$event) ~ OverTime, data = df_ot)
   
   p_ot <- ggsurvplot(
@@ -124,10 +133,12 @@ if ("OverTime" %in% names(df)) {
 # 4) Stratified survival curves by YearsSinceLastPromotion bands
 # ============================================================
 if ("YearsSinceLastPromotion" %in% names(df)) {
-  
+
   df_promo <- df %>%
     mutate(
       years_since_promo = suppressWarnings(as.numeric(YearsSinceLastPromotion)),
+      # Bands make the plot readable for HR leaders and reduce over-precision
+      # from a coarse annual variable.
       promo_band = case_when(
         is.na(years_since_promo) ~ NA_character_,
         years_since_promo <= 1 ~ "0-1 years",

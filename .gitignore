@@ -1,7 +1,11 @@
 # R / renv
 .Rhistory
 .RData
+.Ruserdata
+.Rproj
 .Rproj.user/
+Rplots.pdf
+.Rapp.history
 
 renv/library/
 renv/staging/
@@ -13,6 +17,7 @@ Thumbs.db
 # Temporary files
 *.log
 *.tmp
+*.bak
 
 # Next.js / Node
 node_modules/
@@ -20,3 +25,4 @@ node_modules/
 coverage/
 .idea/
 .venv/
+.vercel

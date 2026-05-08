@@ -231,9 +231,7 @@ async function loadModelDrivers() {
   const coefficientSectionEnd = lines.findIndex((line) => line.startsWith("---"));
   const coefficientLines = lines
     .slice(0, coefficientSectionEnd >= 0 ? coefficientSectionEnd : lines.length)
-    .filter((line) =>
-      /^(DepartmentResearch & Development|DepartmentSales|OverTimeYes|YearsSinceLastPromotion)/.test(line),
-    );
+    .filter((line) => parseCoefficientLine(line) !== null);
 
   const confidenceStart = lines.findIndex((line) => line.includes("exp(coef) exp(-coef) lower .95 upper .95"));
   const confidenceLines = confidenceStart >= 0 ? lines.slice(confidenceStart + 1, confidenceStart + 5) : [];

@@ -48,6 +48,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
   const [selectedTab, setSelectedTab] = useState<DashboardTab>("summary");
   const [selectedScenario, setSelectedScenario] = useState<ScenarioSelection>("overtime");
   const [selectedSurvivalDimension, setSelectedSurvivalDimension] = useState("Department");
+  const [selectedGapTenure, setSelectedGapTenure] = useState(5);
   const [showMoreFilters, setShowMoreFilters] = useState(false);
   const deferredFilters = useDeferredValue(filters);
 
@@ -103,6 +104,13 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
   const selectedScenarioDetails =
     payload.scenarioInputs.find((item) => item.id === selectedScenario) ?? payload.scenarioInputs[0];
   const selectedSurvivalSeries = payload.survival.byDimension[selectedSurvivalDimension] ?? payload.survival.overall;
+  const overtimeSeries = payload.survival.byDimension.OverTime ?? [];
+  const overtimeDriver = payload.modelDrivers.find((driver) => driver.key === "OverTimeYes");
+  const overtimeGapRows = useMemo(() => mergeSurvivalSeries(overtimeSeries), [overtimeSeries]);
+  const overtimeGapSummary = useMemo(
+    () => buildOvertimeGapSummary(overtimeSeries, selectedGapTenure),
+    [overtimeSeries, selectedGapTenure],
+  );
   const activeFilterCount = countActiveFilters(filters);
   const primaryDefinitions = payload.filterDefinitions.filter((definition) => primaryFilterKeys.includes(definition.key));
   const advancedDefinitions = payload.filterDefinitions.filter((definition) => !primaryFilterKeys.includes(definition.key));
@@ -214,6 +222,20 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                 <KpiCard label="Median Tenure" value={`${payload.summary.medianTenure} yrs`} hint="Org-wide baseline" accent="plum" />
               </div>
             </div>
+
+            <OvertimeGapExplorer
+              rows={overtimeGapRows}
+              series={overtimeSeries}
+              selectedTenure={selectedGapTenure}
+              onTenureChange={setSelectedGapTenure}
+              summary={overtimeGapSummary}
+              hazardRatio={overtimeDriver?.hazardRatio}
+              lowerCi={overtimeDriver?.lowerCi}
+              upperCi={overtimeDriver?.upperCi}
+              overTimeFilter={filters.overTime}
+              onCompare={() => setFilters((current) => ({ ...current, overTime: "all" }))}
+              onFocusOvertime={() => setFilters((current) => ({ ...current, overTime: "Yes" }))}
+            />
 
             <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
               <div className="space-y-4">
@@ -617,6 +639,154 @@ function KpiCard({
   );
 }
 
+function OvertimeGapExplorer({
+  rows,
+  series,
+  selectedTenure,
+  onTenureChange,
+  summary,
+  hazardRatio,
+  lowerCi,
+  upperCi,
+  overTimeFilter,
+  onCompare,
+  onFocusOvertime,
+}: {
+  rows: Record<string, number | string>[];
+  series: SurvivalSeries[];
+  selectedTenure: number;
+  onTenureChange: (tenure: number) => void;
+  summary: OvertimeGapSummary;
+  hazardRatio?: number;
+  lowerCi?: number;
+  upperCi?: number;
+  overTimeFilter: string;
+  onCompare: () => void;
+  onFocusOvertime: () => void;
+}) {
+  const canCompare = series.some((item) => item.name === "No") && series.some((item) => item.name === "Yes");
+  const tenureOptions = [1, 3, 5, 7, 10].filter((tenure) =>
+    rows.some((row) => Number(row.tenure) === tenure),
+  );
+
+  return (
+    <section className="rounded-[24px] border border-ember/20 bg-[linear-gradient(180deg,rgba(244,224,204,0.5),rgba(255,255,255,0.94))] p-5 shadow-soft md:p-6">
+      <div className="grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
+        <div>
+          <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-ember">Interactive retention gap</p>
+              <h2 className="mt-1 text-2xl font-semibold text-ink">Overtime retention gap explorer</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                Compare retention by overtime status inside the current population filters and choose the tenure point leaders should plan around.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={onCompare}
+                className="rounded-full border border-ember/25 bg-white px-4 py-2 text-sm font-medium text-ink transition hover:border-ember/50"
+              >
+                Compare groups
+              </button>
+              <button
+                type="button"
+                onClick={onFocusOvertime}
+                className="rounded-full border border-ember bg-ember px-4 py-2 text-sm font-medium text-white transition hover:bg-[#9E4627]"
+              >
+                Focus overtime
+              </button>
+            </div>
+          </div>
+
+          <div className="h-[310px]">
+            {canCompare ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={rows} margin={{ top: 12, right: 18, bottom: 12, left: 4 }}>
+                  <CartesianGrid stroke="#E7ECE8" />
+                  <XAxis dataKey="tenure" label={{ value: "Years at company", position: "insideBottom", offset: -6 }} />
+                  <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} width={38} />
+                  <Tooltip formatter={(value: number) => `${value}% retained`} />
+                  <Legend />
+                  <Line type="monotone" dataKey="No" name="No overtime" stroke="#184A45" dot={false} strokeWidth={2.6} />
+                  <Line type="monotone" dataKey="Yes" name="Overtime" stroke="#B6542F" dot={false} strokeWidth={2.6} />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex h-full items-center justify-center rounded-[22px] border border-dashed border-ember/30 bg-white/72 p-6 text-center text-sm leading-6 text-slate-600">
+                Set Overtime to All to compare both groups within the current population.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <aside className="rounded-[22px] border border-white/80 bg-white/86 p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Planning horizon</p>
+              <p className="mt-1 text-sm text-slate-600">Choose a tenure point for the retention gap.</p>
+            </div>
+            <select
+              aria-label="Overtime retention planning horizon"
+              className="rounded-full border border-ember/25 bg-[#FFF9ED] px-3 py-2 text-sm font-medium text-ink"
+              value={selectedTenure}
+              onChange={(event) => onTenureChange(Number(event.target.value))}
+            >
+              {(tenureOptions.length > 0 ? tenureOptions : [selectedTenure]).map((tenure) => (
+                <option key={tenure} value={tenure}>
+                  {tenure} yrs
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <GapMetric label="No overtime" value={formatGapValue(summary.noOvertime)} />
+            <GapMetric label="Overtime" value={formatGapValue(summary.overtime)} tone="ember" />
+          </div>
+
+          <div className="mt-4 rounded-[20px] bg-[#FFF4E6] px-4 py-4">
+            <p className="text-xs uppercase tracking-[0.18em] text-ember">Retention gap</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-ink">
+              {summary.gap === null ? "N/A" : `${summary.gap.toFixed(1)} pts`}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              {summary.gap === null
+                ? "Both overtime groups are needed for a gap estimate."
+                : `At ${selectedTenure} years, employees reporting overtime retain at a lower modeled rate in this view.`}
+            </p>
+          </div>
+
+          <div className="mt-4 rounded-[20px] border border-slate-200 bg-mist/70 px-4 py-4">
+            <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Modeled driver</p>
+            <p className="mt-2 text-lg font-semibold text-ink">
+              Overtime HR {hazardRatio ? formatMetric(hazardRatio) : "N/A"}
+            </p>
+            <p className="mt-1 text-sm text-slate-600">
+              {lowerCi && upperCi ? `95% CI ${formatMetric(lowerCi)}-${formatMetric(upperCi)}` : "Confidence interval unavailable"}
+            </p>
+          </div>
+
+          {overTimeFilter !== "all" ? (
+            <p className="mt-4 rounded-[18px] border border-ember/20 bg-white px-4 py-3 text-sm leading-6 text-ember">
+              Current Overtime filter is {overTimeFilter}. Use Compare groups to restore the direct comparison.
+            </p>
+          ) : null}
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+function GapMetric({ label, value, tone = "pine" }: { label: string; value: string; tone?: "pine" | "ember" }) {
+  return (
+    <div className="rounded-[18px] border border-slate-200 bg-white px-4 py-3">
+      <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">{label}</p>
+      <p className={`mt-2 text-2xl font-semibold ${tone === "ember" ? "text-ember" : "text-pine"}`}>{value}</p>
+    </div>
+  );
+}
+
 function InsightCard({ text, tone }: { text: string; tone: "pine" | "ember" | "ocean" }) {
   const toneMap = {
     pine: "border-pine/20 bg-[linear-gradient(180deg,rgba(220,232,226,0.52),rgba(255,255,255,0.95))]",
@@ -801,6 +971,34 @@ function mergeSurvivalSeries(series: SurvivalSeries[]) {
   });
 
   return Array.from(rows.values()).sort((a, b) => Number(a.tenure) - Number(b.tenure));
+}
+
+type OvertimeGapSummary = {
+  noOvertime: number | null;
+  overtime: number | null;
+  gap: number | null;
+};
+
+function buildOvertimeGapSummary(series: SurvivalSeries[], tenure: number): OvertimeGapSummary {
+  const noOvertime = getSurvivalAtTenure(series.find((item) => item.name === "No"), tenure);
+  const overtime = getSurvivalAtTenure(series.find((item) => item.name === "Yes"), tenure);
+  const gap = noOvertime === null || overtime === null ? null : Number((noOvertime - overtime).toFixed(1));
+
+  return { noOvertime, overtime, gap };
+}
+
+function getSurvivalAtTenure(series: SurvivalSeries | undefined, tenure: number) {
+  if (!series || series.points.length === 0) return null;
+
+  const exact = series.points.find((point) => point.tenure === tenure);
+  if (exact) return exact.survival;
+
+  const earlierPoints = series.points.filter((point) => point.tenure <= tenure);
+  return earlierPoints.length > 0 ? earlierPoints[earlierPoints.length - 1].survival : null;
+}
+
+function formatGapValue(value: number | null) {
+  return value === null ? "N/A" : `${value.toFixed(1)}%`;
 }
 
 function getMetric(metrics: SegmentMetric[], dimension: string, segment: string) {
