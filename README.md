@@ -3,7 +3,7 @@
 People analytics portfolio project using Kaplan-Meier survival curves, Cox proportional hazards regression, and an executive-facing dashboard to translate attrition risk into retention decisions.
 
 **Live dashboard:** https://hr-attrition-dashboard.vercel.app  
-**Repository:** https://github.com/JoshuaColePhD/HR_Attrition
+**Repository:** https://github.com/JoshuaColePhD/HR_Attrition_and_Survival_Analysis
 
 **Business question:** Where should HR and leadership intervene first to reduce preventable turnover, and when is intervention most likely to matter?
 
