@@ -1,21 +1,11 @@
-import { DashboardView } from "@/components/dashboard-view";
-import { getDashboardPayload, normalizeFiltersFromSearchParams } from "@/lib/dashboard-data";
+import { TableauDashboard } from "@/components/tableau-dashboard";
 
 type HomeProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export default async function Home({ searchParams }: HomeProps) {
-  const resolvedSearchParams = searchParams ? await searchParams : {};
-  const params = new URLSearchParams();
+  await searchParams;
 
-  Object.entries(resolvedSearchParams).forEach(([key, value]) => {
-    if (typeof value === "string") {
-      params.set(key, value);
-    }
-  });
-
-  const payload = await getDashboardPayload(normalizeFiltersFromSearchParams(params));
-
-  return <DashboardView initialPayload={payload} />;
+  return <TableauDashboard tableauUrl={process.env.NEXT_PUBLIC_TABLEAU_VIZ_URL ?? ""} />;
 }
