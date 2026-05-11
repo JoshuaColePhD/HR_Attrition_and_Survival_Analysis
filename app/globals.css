@@ -19,11 +19,10 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at top left, rgba(185, 146, 70, 0.16), transparent 24%),
-    radial-gradient(circle at top right, rgba(43, 111, 138, 0.12), transparent 22%),
-    radial-gradient(circle at 60% 100%, rgba(122, 59, 105, 0.08), transparent 26%),
-    linear-gradient(180deg, #fbfaf6 0%, #eef2ed 100%);
-  color: #101828;
+    radial-gradient(circle at top left, rgba(242, 199, 68, 0.16), transparent 24%),
+    radial-gradient(circle at top right, rgba(31, 119, 180, 0.12), transparent 22%),
+    linear-gradient(180deg, #f7f9fc 0%, #e9edf3 100%);
+  color: #152033;
   font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
 }
 

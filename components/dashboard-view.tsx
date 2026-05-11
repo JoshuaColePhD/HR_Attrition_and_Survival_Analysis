@@ -36,11 +36,11 @@ type DashboardTab = "summary" | "risk-patterns" | "model-scenarios";
 
 const surfaceClass =
   "w-full max-w-full min-w-0 rounded-[18px] border border-white/80 bg-white/88 p-4 shadow-soft backdrop-blur md:rounded-[22px] md:p-5";
-const chartColors = ["#184A45", "#B6542F", "#B99246", "#536B78", "#7A3B69"];
+const chartColors = ["#0F6B7A", "#C94F3D", "#F2C744", "#4F6173", "#5B5FC7"];
 const primaryFilterKeys: FilterKey[] = ["department", "jobRoleFamily", "overTime", "tenureBand"];
-const summarySurfaceClass = `${surfaceClass} border-pine/10 bg-[linear-gradient(180deg,rgba(220,232,226,0.5),rgba(255,255,255,0.92))]`;
-const riskSurfaceClass = `${surfaceClass} border-gold/20 bg-[linear-gradient(180deg,rgba(244,224,204,0.46),rgba(255,255,255,0.94))]`;
-const modelSurfaceClass = `${surfaceClass} border-plum/15 bg-[linear-gradient(180deg,rgba(232,221,237,0.44),rgba(255,255,255,0.94))]`;
+const summarySurfaceClass = `${surfaceClass} border-ocean/10 bg-[linear-gradient(180deg,rgba(243,246,250,0.92),rgba(255,255,255,0.96))]`;
+const riskSurfaceClass = `${surfaceClass} border-gold/30 bg-[linear-gradient(180deg,rgba(255,248,222,0.55),rgba(255,255,255,0.96))]`;
+const modelSurfaceClass = `${surfaceClass} border-ocean/15 bg-[linear-gradient(180deg,rgba(231,240,250,0.72),rgba(255,255,255,0.96))]`;
 
 export function DashboardView({ initialPayload }: DashboardViewProps) {
   const [payload, setPayload] = useState(initialPayload);
@@ -146,12 +146,12 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
           modelConcordance={payload.summary.modelConcordance}
         />
 
-        <div className="sticky top-0 z-10 mb-3 bg-[linear-gradient(180deg,rgba(248,248,244,0.98),rgba(248,248,244,0.84),rgba(248,248,244,0))] pb-2 pt-1 backdrop-blur md:mb-4">
+        <div className="sticky top-0 z-10 mb-3 bg-[linear-gradient(180deg,rgba(247,249,252,0.98),rgba(247,249,252,0.84),rgba(247,249,252,0))] pb-2 pt-1 backdrop-blur md:mb-4">
           <TabBar selectedTab={selectedTab} onChange={setSelectedTab} />
         </div>
 
         <div className="mb-4">
-          <div className={`${surfaceClass} border-slateblue/10 bg-[linear-gradient(180deg,rgba(236,243,246,0.72),rgba(255,255,255,0.96))]`}>
+          <div className={`${surfaceClass} border-ocean/15 bg-[linear-gradient(180deg,rgba(231,240,250,0.72),rgba(255,255,255,0.96))]`}>
             <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:mb-4">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Control panel</p>
@@ -254,7 +254,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                       <p className="text-xs uppercase tracking-[0.22em] text-pine">Key drivers</p>
                   <h3 className="mt-1 text-lg font-semibold text-ink md:text-xl">What deserves attention first</h3>
                     </div>
-                      <div className="w-fit max-w-full rounded-[10px] border border-gold/25 bg-[#FFF9ED] px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-amber-700 sm:text-xs sm:tracking-[0.18em]">
+                      <div className="w-fit max-w-full rounded-[10px] border border-gold/40 bg-[#FFF8DE] px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-amber-700 sm:text-xs sm:tracking-[0.18em]">
                       Risk-informed view
                       </div>
                   </div>
@@ -364,7 +364,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                           {topSegments.map((entry) => (
                             <Cell
                               key={`${entry.dimension}-${entry.segment}`}
-                              fill={entry.dimension === "Overtime" ? "#B6542F" : entry.dimension === "Business Travel" ? "#7A3B69" : "#B99246"}
+                              fill={entry.dimension === "Overtime" ? "#C94F3D" : entry.dimension === "Business Travel" ? "#5B5FC7" : "#F2C744"}
                             />
                           ))}
                         </Bar>
@@ -382,8 +382,8 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                       <AreaChart data={topSegments}>
                         <defs>
                           <linearGradient id="mixFill" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#184A45" stopOpacity={0.45} />
-                            <stop offset="95%" stopColor="#184A45" stopOpacity={0.05} />
+                            <stop offset="5%" stopColor="#1F77B4" stopOpacity={0.35} />
+                            <stop offset="95%" stopColor="#1F77B4" stopOpacity={0.05} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid stroke="#E7ECE8" />
@@ -398,7 +398,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                         />
                         <YAxis tickFormatter={(value) => `${value}%`} width={34} />
                         <Tooltip formatter={(value: number) => `${value}%`} />
-                        <Area type="monotone" dataKey="shareOfPopulation" stroke="#2B6F8A" fill="url(#mixFill)" />
+                        <Area type="monotone" dataKey="shareOfPopulation" stroke="#1F77B4" fill="url(#mixFill)" />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
@@ -462,12 +462,12 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
           <section aria-label="Model and Scenarios tab" className="space-y-4">
             <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]">
               <div className={modelSurfaceClass}>
-                <p className="text-xs uppercase tracking-[0.24em] text-plum">Model + Scenarios</p>
+                <p className="text-xs uppercase tracking-[0.24em] text-ocean">Model + Scenarios</p>
                 <div className="mt-1 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                   <h2 className="text-xl font-semibold text-ink md:text-2xl">Why risk may be elevated</h2>
                   <p className="max-w-xl text-sm text-slate-600">{payload.notes.modelCaution}</p>
                 </div>
-                <div className="mt-4 rounded-[16px] border border-gold/30 bg-[#FFF9ED] px-4 py-3 text-sm text-slate-700">
+                <div className="mt-4 rounded-[16px] border border-gold/40 bg-[#FFF8DE] px-4 py-3 text-sm text-slate-700">
                   Modeled effects come from the current Cox proportional hazards analysis. They support prioritization but
                   do not prove causality or justify person-level decisions.
                 </div>
@@ -488,7 +488,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                       <Tooltip formatter={(value: number) => formatMetric(value)} />
                       <Bar dataKey="hazardRatio" radius={[8, 8, 0, 0]}>
                         {payload.modelDrivers.map((driver) => (
-                          <Cell key={driver.key} fill={driver.hazardRatio > 1 ? "#B6542F" : "#184A45"} />
+                          <Cell key={driver.key} fill={driver.hazardRatio > 1 ? "#C94F3D" : "#0F6B7A"} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -514,7 +514,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
               </div>
 
               <div className={modelSurfaceClass}>
-                <p className="text-xs uppercase tracking-[0.24em] text-plum">Scenario Explorer</p>
+                <p className="text-xs uppercase tracking-[0.24em] text-ocean">Scenario Explorer</p>
                 <h2 className="mt-1 text-xl font-semibold text-ink md:text-2xl">What might reduce pressure</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
                   Aggregate scenarios are designed for staffing and retention planning, not prediction at the employee level.
@@ -527,8 +527,8 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                       onClick={() => setSelectedScenario(scenario.id)}
                       className={`rounded-[22px] border px-4 py-4 text-left transition ${
                         selectedScenario === scenario.id
-                          ? "border-plum bg-plum text-white"
-                          : "border-slate-200 bg-[linear-gradient(180deg,rgba(232,221,237,0.4),rgba(255,255,255,0.92))] text-ink hover:border-plum/40"
+                          ? "border-ocean bg-ocean text-white"
+                          : "border-slate-200 bg-[linear-gradient(180deg,rgba(231,240,250,0.55),rgba(255,255,255,0.94))] text-ink hover:border-ocean/40"
                       }`}
                     >
                       <p className="text-sm font-semibold">{scenario.label}</p>
@@ -661,7 +661,7 @@ function TabBar({
                   ? "bg-pine text-white"
                   : tab.id === "risk-patterns"
                     ? "bg-ember text-white"
-                    : "bg-plum text-white"
+                    : "bg-ocean text-white"
                 : "text-slate-600 hover:bg-mist hover:text-ink"
             }`}
           >
@@ -686,11 +686,11 @@ function KpiCard({
   accent: "pine" | "ember" | "gold" | "ocean" | "plum";
 }) {
   const accentMap = {
-    pine: "border-t-pine bg-[linear-gradient(180deg,rgba(220,232,226,0.5),rgba(255,255,255,0.95))]",
-    ember: "border-t-ember bg-[linear-gradient(180deg,rgba(244,224,204,0.52),rgba(255,255,255,0.95))]",
-    gold: "border-t-gold bg-[linear-gradient(180deg,rgba(249,241,219,0.7),rgba(255,255,255,0.95))]",
-    ocean: "border-t-ocean bg-[linear-gradient(180deg,rgba(220,234,240,0.62),rgba(255,255,255,0.95))]",
-    plum: "border-t-plum bg-[linear-gradient(180deg,rgba(232,221,237,0.55),rgba(255,255,255,0.95))]",
+    pine: "border-t-pine bg-[linear-gradient(180deg,rgba(217,238,242,0.6),rgba(255,255,255,0.96))]",
+    ember: "border-t-ember bg-[linear-gradient(180deg,rgba(251,228,223,0.68),rgba(255,255,255,0.96))]",
+    gold: "border-t-gold bg-[linear-gradient(180deg,rgba(255,248,222,0.78),rgba(255,255,255,0.96))]",
+    ocean: "border-t-ocean bg-[linear-gradient(180deg,rgba(221,236,248,0.72),rgba(255,255,255,0.96))]",
+    plum: "border-t-slateblue bg-[linear-gradient(180deg,rgba(243,246,250,0.9),rgba(255,255,255,0.96))]",
   } as const;
 
   return (
@@ -733,7 +733,7 @@ function OvertimeGapExplorer({
   );
 
   return (
-    <section className="min-w-0 rounded-[18px] border border-ember/20 bg-[linear-gradient(180deg,rgba(244,224,204,0.42),rgba(255,255,255,0.96))] p-4 shadow-soft md:rounded-[22px] md:p-5">
+    <section className="min-w-0 rounded-[18px] border border-ember/20 bg-[linear-gradient(180deg,rgba(251,228,223,0.45),rgba(255,255,255,0.96))] p-4 shadow-soft md:rounded-[22px] md:p-5">
       <div className="grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
         <div className="min-w-0">
           <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -771,8 +771,8 @@ function OvertimeGapExplorer({
                   <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} width={38} />
                   <Tooltip formatter={(value: number) => `${value}% retained`} />
                   <Legend />
-                  <Line type="monotone" dataKey="No" name="No overtime" stroke="#184A45" dot={false} strokeWidth={2.6} />
-                  <Line type="monotone" dataKey="Yes" name="Overtime" stroke="#B6542F" dot={false} strokeWidth={2.6} />
+                  <Line type="monotone" dataKey="No" name="No overtime" stroke="#0F6B7A" dot={false} strokeWidth={2.6} />
+                  <Line type="monotone" dataKey="Yes" name="Overtime" stroke="#C94F3D" dot={false} strokeWidth={2.6} />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
@@ -791,7 +791,7 @@ function OvertimeGapExplorer({
             </div>
             <select
               aria-label="Overtime retention planning horizon"
-              className="rounded-full border border-ember/25 bg-[#FFF9ED] px-3 py-2 text-sm font-medium text-ink"
+              className="rounded-full border border-ember/25 bg-[#FFF8DE] px-3 py-2 text-sm font-medium text-ink"
               value={selectedTenure}
               onChange={(event) => onTenureChange(Number(event.target.value))}
             >
@@ -808,7 +808,7 @@ function OvertimeGapExplorer({
             <GapMetric label="Overtime" value={formatGapValue(summary.overtime)} tone="ember" />
           </div>
 
-          <div className="mt-4 rounded-[20px] bg-[#FFF4E6] px-4 py-4">
+          <div className="mt-4 rounded-[20px] bg-[#FFF2D0] px-4 py-4">
             <p className="text-xs uppercase tracking-[0.18em] text-ember">Retention gap</p>
             <p className="mt-2 text-3xl font-semibold tracking-tight text-ink">
               {summary.gap === null ? "N/A" : `${summary.gap.toFixed(1)} pts`}
@@ -852,9 +852,9 @@ function GapMetric({ label, value, tone = "pine" }: { label: string; value: stri
 
 function InsightCard({ text, tone }: { text: string; tone: "pine" | "ember" | "ocean" }) {
   const toneMap = {
-    pine: "border-pine/20 bg-[linear-gradient(180deg,rgba(220,232,226,0.52),rgba(255,255,255,0.95))]",
-    ember: "border-ember/20 bg-[linear-gradient(180deg,rgba(244,224,204,0.56),rgba(255,255,255,0.95))]",
-    ocean: "border-ocean/20 bg-[linear-gradient(180deg,rgba(220,234,240,0.6),rgba(255,255,255,0.95))]",
+    pine: "border-pine/25 bg-[linear-gradient(180deg,rgba(217,238,242,0.62),rgba(255,255,255,0.96))]",
+    ember: "border-ember/25 bg-[linear-gradient(180deg,rgba(251,228,223,0.7),rgba(255,255,255,0.96))]",
+    ocean: "border-ocean/25 bg-[linear-gradient(180deg,rgba(221,236,248,0.72),rgba(255,255,255,0.96))]",
   } as const;
 
   return (
@@ -960,8 +960,8 @@ function CompactListCard({
   tone: "ember" | "ocean";
 }) {
   const toneMap = {
-    ember: "border-ember/20 bg-[linear-gradient(180deg,rgba(244,224,204,0.56),rgba(255,255,255,0.95))]",
-    ocean: "border-ocean/20 bg-[linear-gradient(180deg,rgba(220,234,240,0.6),rgba(255,255,255,0.95))]",
+    ember: "border-ember/25 bg-[linear-gradient(180deg,rgba(251,228,223,0.7),rgba(255,255,255,0.96))]",
+    ocean: "border-ocean/25 bg-[linear-gradient(180deg,rgba(221,236,248,0.72),rgba(255,255,255,0.96))]",
   } as const;
 
   return (
@@ -981,9 +981,9 @@ function CompactListCard({
 function ScenarioPanel({ scenario }: { scenario: ScenarioDefinition }) {
   const badgeTone =
     scenario.expectedDirection === "decrease"
-      ? "bg-[#ECF8F3] text-pine"
+      ? "bg-[#D9EEF2] text-pine"
       : scenario.expectedDirection === "mixed"
-        ? "bg-[#FFF4E6] text-ember"
+        ? "bg-[#FFF2D0] text-ember"
         : "bg-slate-100 text-slate-700";
 
   return (
