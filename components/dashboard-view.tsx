@@ -35,7 +35,7 @@ type ScenarioSelection = "overtime" | "promotion";
 type DashboardTab = "summary" | "risk-patterns" | "model-scenarios";
 
 const surfaceClass =
-  "w-full max-w-full min-w-0 rounded-[22px] border border-white/70 bg-white/82 p-4 shadow-soft backdrop-blur md:rounded-[28px] md:p-6";
+  "w-full max-w-full min-w-0 rounded-[18px] border border-white/80 bg-white/88 p-4 shadow-soft backdrop-blur md:rounded-[22px] md:p-5";
 const chartColors = ["#184A45", "#B6542F", "#B99246", "#536B78", "#7A3B69"];
 const primaryFilterKeys: FilterKey[] = ["department", "jobRoleFamily", "overTime", "tenureBand"];
 const summarySurfaceClass = `${surfaceClass} border-pine/10 bg-[linear-gradient(180deg,rgba(220,232,226,0.5),rgba(255,255,255,0.92))]`;
@@ -116,40 +116,46 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
   const advancedDefinitions = payload.filterDefinitions.filter((definition) => !primaryFilterKeys.includes(definition.key));
 
   return (
-    <main className="min-h-screen overflow-x-hidden px-3 py-4 md:px-8 md:py-7">
+    <main className="min-h-screen overflow-x-hidden px-3 py-4 md:px-7 md:py-6">
       <div className="mx-auto w-full max-w-7xl min-w-0">
-        <header className="mb-3 overflow-hidden rounded-[24px] border border-pine/10 bg-ink px-4 py-5 text-white shadow-soft md:mb-4 md:rounded-[30px] md:px-7 md:py-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div className="min-w-0 max-w-3xl">
+        <header className="mb-3 overflow-hidden rounded-[20px] border border-pine/10 bg-ink px-4 py-4 text-white shadow-soft md:rounded-[24px] md:px-6 md:py-5">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div className="min-w-0 max-w-4xl">
               <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-sand/75 md:text-[11px] md:tracking-[0.28em]">
                 Executive Attrition Risk Dashboard
               </p>
-              <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl md:text-[2.7rem]">
+              <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl md:text-[2.35rem]">
                 Workforce retention risk overview.
               </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-sand/80">
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-sand/80">
                 Aggregated attrition insights for business leaders, with action guidance grounded in current risk patterns.
               </p>
             </div>
-            <div className="grid min-w-0 gap-2 text-sm text-sand/90 sm:grid-cols-2 md:w-[320px] md:gap-3">
-              <MetricBadge label="Scope" value={`${payload.summary.filteredEmployees} employees`} />
-              <MetricBadge label="Attritions" value={`${payload.summary.filteredAttritions}`} />
-              <MetricBadge label="Generated" value={formatGeneratedDate(payload.generatedAt)} />
-              <MetricBadge label="Model C-index" value={payload.summary.modelConcordance.toFixed(2)} />
+            <div className="rounded-[16px] border border-white/10 bg-white/5 px-3 py-2 text-sm text-sand/85 md:min-w-[250px]">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-sand/65">Dashboard view</p>
+              <p className="mt-1 font-semibold text-white">{activeFilterCount === 0 ? "Full workforce" : `${activeFilterCount} filtered dimension${activeFilterCount === 1 ? "" : "s"}`}</p>
             </div>
           </div>
         </header>
+
+        <ContextBar
+          employees={payload.summary.filteredEmployees}
+          attritions={payload.summary.filteredAttritions}
+          activeFilterCount={activeFilterCount}
+          generatedAt={payload.generatedAt}
+          modelConcordance={payload.summary.modelConcordance}
+        />
 
         <div className="sticky top-0 z-10 mb-3 bg-[linear-gradient(180deg,rgba(248,248,244,0.98),rgba(248,248,244,0.84),rgba(248,248,244,0))] pb-2 pt-1 backdrop-blur md:mb-4">
           <TabBar selectedTab={selectedTab} onChange={setSelectedTab} />
         </div>
 
         <div className="mb-4">
-          <div className={`${surfaceClass} border-slateblue/10 bg-[linear-gradient(180deg,rgba(220,234,240,0.6),rgba(255,255,255,0.92))]`}>
+          <div className={`${surfaceClass} border-slateblue/10 bg-[linear-gradient(180deg,rgba(236,243,246,0.72),rgba(255,255,255,0.96))]`}>
             <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:mb-4">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Population filters</p>
-                <p className="mt-1 text-sm text-slate-600">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Control panel</p>
+                <p className="mt-1 text-sm font-medium text-slate-700">
                   {activeFilterCount === 0
                     ? "All employees in view"
                     : `${activeFilterCount} active filter${activeFilterCount === 1 ? "" : "s"} applied`}
@@ -159,14 +165,14 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                 <button
                   type="button"
                   onClick={() => setShowMoreFilters((current) => !current)}
-                  className="rounded-full border border-pine/20 bg-mist px-3 py-2 text-sm text-ink transition hover:border-pine/40 md:px-4"
+                  className="rounded-[12px] border border-pine/20 bg-mist px-3 py-2 text-sm text-ink transition hover:border-pine/40 md:px-4"
                 >
                   {showMoreFilters ? "Fewer filters" : "More filters"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setFilters(payload.filters)}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-pine/30 md:px-4"
+                  className="rounded-[12px] border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-pine/30 md:px-4"
                 >
                   Reset filters
                 </button>
@@ -195,7 +201,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
               <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-[0.24em] text-pine">Summary</p>
-                  <h2 className="mt-1 text-2xl font-semibold text-ink">Current attrition picture</h2>
+                  <h2 className="mt-1 text-xl font-semibold text-ink md:text-2xl">Current attrition picture</h2>
                 </div>
                 <p className="max-w-xl text-sm text-slate-600">{payload.recommendations.summary}</p>
               </div>
@@ -246,9 +252,9 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
                       <p className="text-xs uppercase tracking-[0.22em] text-pine">Key drivers</p>
-                      <h3 className="mt-1 text-xl font-semibold text-ink">What deserves attention first</h3>
+                  <h3 className="mt-1 text-lg font-semibold text-ink md:text-xl">What deserves attention first</h3>
                     </div>
-                      <div className="w-fit max-w-full rounded-full bg-[#FFF9ED] px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-amber-700 sm:text-xs sm:tracking-[0.18em]">
+                      <div className="w-fit max-w-full rounded-[10px] border border-gold/25 bg-[#FFF9ED] px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-amber-700 sm:text-xs sm:tracking-[0.18em]">
                       Risk-informed view
                       </div>
                   </div>
@@ -263,7 +269,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                     <div>
                       <p className="text-xs uppercase tracking-[0.22em] text-pine">Recommended Actions</p>
-                      <h3 className="mt-1 text-xl font-semibold text-ink">Evidence-based next steps</h3>
+                      <h3 className="mt-1 text-lg font-semibold text-ink md:text-xl">Evidence-based next steps</h3>
                     </div>
                     <p className="max-w-xl text-sm text-slate-600">{payload.notes.dataScope}</p>
                   </div>
@@ -340,7 +346,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
             <div className={riskSurfaceClass}>
               <div className="mb-4">
                 <p className="text-xs uppercase tracking-[0.24em] text-ember">Risk Patterns</p>
-                <h2 className="mt-1 text-2xl font-semibold text-ink">Segment filters and concentration views</h2>
+                <h2 className="mt-1 text-xl font-semibold text-ink md:text-2xl">Segment filters and concentration views</h2>
                 <p className="mt-2 max-w-2xl text-sm text-slate-600">
                   Descriptive patterns update with the global filters and help show where observed attrition is concentrated.
                 </p>
@@ -458,10 +464,10 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
               <div className={modelSurfaceClass}>
                 <p className="text-xs uppercase tracking-[0.24em] text-plum">Model + Scenarios</p>
                 <div className="mt-1 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-                  <h2 className="text-2xl font-semibold text-ink">Why risk may be elevated</h2>
+                  <h2 className="text-xl font-semibold text-ink md:text-2xl">Why risk may be elevated</h2>
                   <p className="max-w-xl text-sm text-slate-600">{payload.notes.modelCaution}</p>
                 </div>
-                <div className="mt-4 rounded-3xl border border-gold/30 bg-[#FFF9ED] px-4 py-3 text-sm text-slate-700">
+                <div className="mt-4 rounded-[16px] border border-gold/30 bg-[#FFF9ED] px-4 py-3 text-sm text-slate-700">
                   Modeled effects come from the current Cox proportional hazards analysis. They support prioritization but
                   do not prove causality or justify person-level decisions.
                 </div>
@@ -509,7 +515,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
 
               <div className={modelSurfaceClass}>
                 <p className="text-xs uppercase tracking-[0.24em] text-plum">Scenario Explorer</p>
-                <h2 className="mt-1 text-2xl font-semibold text-ink">What might reduce pressure</h2>
+                <h2 className="mt-1 text-xl font-semibold text-ink md:text-2xl">What might reduce pressure</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
                   Aggregate scenarios are designed for staffing and retention planning, not prediction at the employee level.
                 </p>
@@ -593,11 +599,35 @@ function formatGeneratedDate(value: string) {
   }).format(parsed);
 }
 
-function MetricBadge({ label, value }: { label: string; value: string }) {
+function ContextBar({
+  employees,
+  attritions,
+  activeFilterCount,
+  generatedAt,
+  modelConcordance,
+}: {
+  employees: number;
+  attritions: number;
+  activeFilterCount: number;
+  generatedAt: string;
+  modelConcordance: number;
+}) {
+  const items = [
+    { label: "Selected population", value: `${employees} employees` },
+    { label: "Observed attritions", value: `${attritions}` },
+    { label: "Filters active", value: activeFilterCount === 0 ? "None" : `${activeFilterCount}` },
+    { label: "Generated", value: formatGeneratedDate(generatedAt) },
+    { label: "Model C-index", value: modelConcordance.toFixed(2) },
+  ];
+
   return (
-    <div className="min-w-0 rounded-[16px] border border-white/10 bg-white/5 px-3 py-2.5 md:rounded-[20px] md:px-4 md:py-3">
-      <p className="text-[10px] uppercase tracking-[0.18em] text-sand/70 md:text-[11px] md:tracking-[0.22em]">{label}</p>
-      <p className="mt-1 break-words text-[13px] font-semibold text-white md:text-sm">{value}</p>
+    <div className="mb-3 grid min-w-0 gap-2 rounded-[18px] border border-slate-200 bg-white/92 p-2 shadow-soft md:mb-4 md:grid-cols-5">
+      {items.map((item) => (
+        <div key={item.label} className="min-w-0 rounded-[12px] border border-slate-100 bg-mist/55 px-3 py-2">
+          <p className="text-[10px] uppercase tracking-[0.16em] text-slate-500">{item.label}</p>
+          <p className="mt-1 break-words text-sm font-semibold text-ink">{item.value}</p>
+        </div>
+      ))}
     </div>
   );
 }
@@ -616,7 +646,7 @@ function TabBar({
   ];
 
   return (
-    <nav aria-label="Dashboard tabs" className="rounded-[20px] border border-white/70 bg-white/90 p-1 shadow-soft backdrop-blur md:rounded-full md:bg-white/82">
+    <nav aria-label="Dashboard tabs" className="rounded-[16px] border border-white/70 bg-white/92 p-1 shadow-soft backdrop-blur md:rounded-[18px]">
       <div className="grid grid-cols-3 gap-1">
         {tabs.map((tab) => (
           <button
@@ -625,7 +655,7 @@ function TabBar({
             aria-label={tab.label}
             aria-pressed={selectedTab === tab.id}
             onClick={() => onChange(tab.id)}
-            className={`min-h-10 min-w-0 rounded-[16px] px-1.5 py-2 text-xs font-medium leading-tight transition md:rounded-full md:px-4 md:py-3 md:text-sm ${
+            className={`min-h-10 min-w-0 rounded-[12px] px-1.5 py-2 text-xs font-medium leading-tight transition md:px-4 md:py-2.5 md:text-sm ${
               selectedTab === tab.id
                 ? tab.id === "summary"
                   ? "bg-pine text-white"
@@ -664,10 +694,10 @@ function KpiCard({
   } as const;
 
   return (
-    <article className={`min-w-0 rounded-[18px] border border-slate-200 border-t-4 px-4 py-4 md:rounded-[22px] md:py-5 ${accentMap[accent]}`}>
-      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 md:text-xs md:tracking-[0.22em]">{label}</p>
-      <p className="mt-2 break-words text-2xl font-semibold tracking-tight text-ink md:mt-3 md:text-3xl">{value}</p>
-      <p className="mt-1.5 break-words text-sm text-slate-600 md:mt-2">{hint}</p>
+    <article className={`min-w-0 rounded-[14px] border border-slate-200 border-t-4 px-4 py-3 md:py-4 ${accentMap[accent]}`}>
+      <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500 md:text-[11px] md:tracking-[0.2em]">{label}</p>
+      <p className="mt-2 break-words text-2xl font-semibold tracking-tight text-ink md:text-[1.65rem]">{value}</p>
+      <p className="mt-1 break-words text-xs text-slate-600 md:text-sm">{hint}</p>
     </article>
   );
 }
@@ -703,7 +733,7 @@ function OvertimeGapExplorer({
   );
 
   return (
-    <section className="min-w-0 rounded-[22px] border border-ember/20 bg-[linear-gradient(180deg,rgba(244,224,204,0.5),rgba(255,255,255,0.94))] p-4 shadow-soft md:rounded-[24px] md:p-6">
+    <section className="min-w-0 rounded-[18px] border border-ember/20 bg-[linear-gradient(180deg,rgba(244,224,204,0.42),rgba(255,255,255,0.96))] p-4 shadow-soft md:rounded-[22px] md:p-5">
       <div className="grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
         <div className="min-w-0">
           <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -813,7 +843,7 @@ function OvertimeGapExplorer({
 
 function GapMetric({ label, value, tone = "pine" }: { label: string; value: string; tone?: "pine" | "ember" }) {
   return (
-    <div className="min-w-0 rounded-[18px] border border-slate-200 bg-white px-4 py-3">
+    <div className="min-w-0 rounded-[14px] border border-slate-200 bg-white px-4 py-3">
       <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">{label}</p>
       <p className={`mt-2 break-words text-2xl font-semibold ${tone === "ember" ? "text-ember" : "text-pine"}`}>{value}</p>
     </div>
@@ -828,7 +858,7 @@ function InsightCard({ text, tone }: { text: string; tone: "pine" | "ember" | "o
   } as const;
 
   return (
-    <article className={`min-w-0 rounded-[22px] border p-4 ${toneMap[tone]}`}>
+    <article className={`min-w-0 rounded-[14px] border p-4 ${toneMap[tone]}`}>
       <p className="break-words text-sm leading-6 text-slate-700">{text}</p>
     </article>
   );
@@ -836,8 +866,8 @@ function InsightCard({ text, tone }: { text: string; tone: "pine" | "ember" | "o
 
 function Panel({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
   return (
-    <section className="min-w-0 rounded-[24px] border border-slate-200 bg-white p-4 md:p-5">
-      <div className="mb-4 min-w-0">
+    <section className="min-w-0 rounded-[16px] border border-slate-200 bg-white p-4 shadow-[0_12px_30px_rgba(16,24,40,0.04)] md:p-5">
+      <div className="mb-4 min-w-0 border-b border-slate-100 pb-3">
         <h3 className="text-lg font-semibold text-ink">{title}</h3>
         <p className="mt-1 break-words text-sm text-slate-600">{subtitle}</p>
       </div>
@@ -859,10 +889,10 @@ function FilterBar({
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {definitions.map((definition) => (
         <label key={definition.key} className="block">
-          <span className="mb-1 block text-[11px] uppercase tracking-[0.16em] text-slate-500">{definition.label}</span>
+          <span className="mb-1 block text-[10px] uppercase tracking-[0.16em] text-slate-500">{definition.label}</span>
           <select
             aria-label={definition.label}
-            className="w-full rounded-[14px] border border-pine/15 bg-white px-3 py-2.5 text-sm text-ink shadow-sm outline-none transition focus:border-pine md:rounded-[16px] md:px-4 md:py-3"
+            className="w-full rounded-[10px] border border-pine/15 bg-white px-3 py-2.5 text-sm text-ink shadow-sm outline-none transition focus:border-pine md:px-3 md:py-2.5"
             value={filters[definition.key]}
             onChange={(event) => onChange(definition.key, event.target.value)}
           >
@@ -880,7 +910,7 @@ function FilterBar({
 
 function CompactTable({ rows }: { rows: SegmentMetric[] }) {
   return (
-    <div className="rounded-[20px] border border-slate-200 md:rounded-3xl">
+    <div className="rounded-[14px] border border-slate-200 md:rounded-[16px]">
       <div className="divide-y divide-slate-100 sm:hidden">
         {rows.map((row) => (
           <article key={`${row.dimension}-${row.segment}`} className="p-4">
@@ -935,7 +965,7 @@ function CompactListCard({
   } as const;
 
   return (
-    <section className={`min-w-0 rounded-[22px] border p-4 md:p-5 ${toneMap[tone]}`}>
+    <section className={`min-w-0 rounded-[16px] border p-4 md:p-5 ${toneMap[tone]}`}>
       <h3 className="text-base font-semibold text-ink">{title}</h3>
       <ul className="mt-3 space-y-3 pl-5 text-sm leading-6 text-slate-700">
         {items.map((item) => (
@@ -957,7 +987,7 @@ function ScenarioPanel({ scenario }: { scenario: ScenarioDefinition }) {
         : "bg-slate-100 text-slate-700";
 
   return (
-    <div className="mt-5 min-w-0 rounded-[24px] border border-slate-200 bg-white p-4 md:p-5">
+    <div className="mt-5 min-w-0 rounded-[16px] border border-slate-200 bg-white p-4 md:p-5">
       <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${badgeTone}`}>
         {scenario.expectedDirection === "decrease"
           ? "Expected pressure decreases"
@@ -985,7 +1015,7 @@ function RecommendationSection({
   const ListTag = ordered ? "ol" : "ul";
 
   return (
-    <section className="min-w-0 rounded-[22px] border border-slate-200 bg-white p-4 md:p-5">
+    <section className="min-w-0 rounded-[16px] border border-slate-200 bg-white p-4 md:p-5">
       <h3 className="text-lg font-semibold text-ink">{title}</h3>
       <ListTag className={`mt-4 space-y-3 ${ordered ? "list-decimal pl-5" : "list-disc pl-5"}`}>
         {items.map((item) => (
@@ -1000,7 +1030,7 @@ function RecommendationSection({
 
 function TextPanel({ title, body }: { title: string; body: string }) {
   return (
-    <section className="min-w-0 rounded-[22px] border border-slate-200 bg-white p-4 md:p-5">
+    <section className="min-w-0 rounded-[16px] border border-slate-200 bg-white p-4 md:p-5">
       <h3 className="text-lg font-semibold text-ink">{title}</h3>
       <p className="mt-3 break-words text-sm leading-6 text-slate-700">{body}</p>
     </section>
