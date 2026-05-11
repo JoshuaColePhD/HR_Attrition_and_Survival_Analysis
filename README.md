@@ -19,12 +19,14 @@ This project treats attrition as a time-to-event problem instead of a simple yes
 
 Key results:
 
-| Finding | Evidence | Business implication |
+| Result | Evidence | Takeaway |
 | --- | ---: | --- |
-| Overtime is the dominant risk factor | HR = 3.07, 95% CI 2.38-3.97 | Prioritize workload redesign, staffing coverage, manager escalation paths, and burnout prevention before attrition materializes. |
-| Promotion timing is associated with lower observed hazard | HR = 0.87 per year, 95% CI 0.83-0.91 | Treat as a stability/survivor-effect signal, not proof that delaying promotions reduces attrition. Use it to prompt career path and mobility reviews. |
-| Department effects are not statistically clear after adjustment | Sales HR = 1.30, 95% CI 0.71-2.39 | Segment monitoring by department is useful, but interventions should target workload and growth conditions rather than department labels alone. |
-| Model discrimination is portfolio-ready | C-index = 0.74 | The model separates higher- and lower-risk profiles reasonably well for aggregate planning and executive discussion. |
+| Overtime is the clearest risk signal | HR = 3.07 | Prioritize workload, staffing, and burnout prevention. |
+| Promotion timing appears protective | HR = 0.87 | Use as a career-path review prompt, not a causal claim. |
+| Department effects are inconclusive | Sales HR = 1.30 | Monitor departments, but target work conditions first. |
+| Model separation is portfolio-ready | C-index = 0.74 | Useful for aggregate planning and executive discussion. |
+
+Confidence intervals and model diagnostics are documented in `figures/cox_summary.txt` and `figures/cox_ph_test.txt`.
 
 ## Recommended Actions
 
