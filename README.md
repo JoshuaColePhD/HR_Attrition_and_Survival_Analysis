@@ -5,7 +5,7 @@ People analytics portfolio project using Kaplan-Meier survival curves, Cox propo
 **Live dashboard:** https://hr-attrition-dashboard.vercel.app  
 **Repository:** https://github.com/JoshuaColePhD/HR_Attrition_and_Survival_Analysis
 
-![Recruiter-friendly attrition risk driver chart](figures/recruiter_attrition_drivers.png)
+![Recruiter-friendly attrition risk driver chart](figures/attrition_risk_drivers_clean.png)
 
 *Static README visual: adjusted hazard ratios from the Cox model. For interactive filtering and dashboard views, open the live dashboard linked above.*
 
