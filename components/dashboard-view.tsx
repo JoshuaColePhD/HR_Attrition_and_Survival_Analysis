@@ -35,7 +35,7 @@ type ScenarioSelection = "overtime" | "promotion";
 type DashboardTab = "summary" | "risk-patterns" | "model-scenarios";
 
 const surfaceClass =
-  "rounded-[28px] border border-white/70 bg-white/82 p-5 shadow-soft backdrop-blur md:p-6";
+  "w-full max-w-full min-w-0 rounded-[22px] border border-white/70 bg-white/82 p-4 shadow-soft backdrop-blur md:rounded-[28px] md:p-6";
 const chartColors = ["#184A45", "#B6542F", "#B99246", "#536B78", "#7A3B69"];
 const primaryFilterKeys: FilterKey[] = ["department", "jobRoleFamily", "overTime", "tenureBand"];
 const summarySurfaceClass = `${surfaceClass} border-pine/10 bg-[linear-gradient(180deg,rgba(220,232,226,0.5),rgba(255,255,255,0.92))]`;
@@ -116,22 +116,22 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
   const advancedDefinitions = payload.filterDefinitions.filter((definition) => !primaryFilterKeys.includes(definition.key));
 
   return (
-    <main className="min-h-screen px-4 py-5 md:px-8 md:py-7">
-      <div className="mx-auto max-w-7xl">
-        <header className="mb-4 overflow-hidden rounded-[30px] border border-pine/10 bg-ink px-5 py-6 text-white shadow-soft md:px-7">
-          <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-3xl">
-              <p className="mb-2 text-[11px] uppercase tracking-[0.28em] text-sand/75">
+    <main className="min-h-screen overflow-x-hidden px-3 py-4 md:px-8 md:py-7">
+      <div className="mx-auto w-full max-w-7xl min-w-0">
+        <header className="mb-3 overflow-hidden rounded-[24px] border border-pine/10 bg-ink px-4 py-5 text-white shadow-soft md:mb-4 md:rounded-[30px] md:px-7 md:py-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="min-w-0 max-w-3xl">
+              <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-sand/75 md:text-[11px] md:tracking-[0.28em]">
                 Executive Attrition Risk Dashboard
               </p>
-              <h1 className="text-3xl font-semibold tracking-tight md:text-[2.7rem]">
+              <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl md:text-[2.7rem]">
                 Workforce retention risk overview.
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-sand/80">
                 Aggregated attrition insights for business leaders, with action guidance grounded in current risk patterns.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-3 text-sm text-sand/90 md:w-[320px]">
+            <div className="grid min-w-0 gap-2 text-sm text-sand/90 sm:grid-cols-2 md:w-[320px] md:gap-3">
               <MetricBadge label="Scope" value={`${payload.summary.filteredEmployees} employees`} />
               <MetricBadge label="Attritions" value={`${payload.summary.filteredAttritions}`} />
               <MetricBadge label="Generated" value={formatGeneratedDate(payload.generatedAt)} />
@@ -140,30 +140,33 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
           </div>
         </header>
 
-        <div className="sticky top-0 z-10 mb-4 space-y-3 bg-[linear-gradient(180deg,rgba(248,248,244,0.98),rgba(248,248,244,0.9),rgba(248,248,244,0))] pb-3 pt-1 backdrop-blur">
+        <div className="sticky top-0 z-10 mb-3 bg-[linear-gradient(180deg,rgba(248,248,244,0.98),rgba(248,248,244,0.84),rgba(248,248,244,0))] pb-2 pt-1 backdrop-blur md:mb-4">
           <TabBar selectedTab={selectedTab} onChange={setSelectedTab} />
+        </div>
+
+        <div className="mb-4">
           <div className={`${surfaceClass} border-slateblue/10 bg-[linear-gradient(180deg,rgba(220,234,240,0.6),rgba(255,255,255,0.92))]`}>
-            <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:mb-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Population filters</p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Population filters</p>
                 <p className="mt-1 text-sm text-slate-600">
                   {activeFilterCount === 0
                     ? "All employees in view"
                     : `${activeFilterCount} active filter${activeFilterCount === 1 ? "" : "s"} applied`}
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid gap-2 sm:flex sm:flex-wrap">
                 <button
                   type="button"
                   onClick={() => setShowMoreFilters((current) => !current)}
-                  className="rounded-full border border-pine/20 bg-mist px-4 py-2 text-sm text-ink transition hover:border-pine/40"
+                  className="rounded-full border border-pine/20 bg-mist px-3 py-2 text-sm text-ink transition hover:border-pine/40 md:px-4"
                 >
                   {showMoreFilters ? "Fewer filters" : "More filters"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setFilters(payload.filters)}
-                  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 transition hover:border-pine/30"
+                  className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-pine/30 md:px-4"
                 >
                   Reset filters
                 </button>
@@ -237,15 +240,15 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
               onFocusOvertime={() => setFilters((current) => ({ ...current, overTime: "Yes" }))}
             />
 
-            <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-              <div className="space-y-4">
+            <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+              <div className="min-w-0 space-y-4">
                 <section className={summarySurfaceClass}>
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
+                  <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0">
                       <p className="text-xs uppercase tracking-[0.22em] text-pine">Key drivers</p>
                       <h3 className="mt-1 text-xl font-semibold text-ink">What deserves attention first</h3>
                     </div>
-                      <div className="rounded-full bg-[#FFF9ED] px-3 py-1 text-xs uppercase tracking-[0.18em] text-amber-700">
+                      <div className="w-fit max-w-full rounded-full bg-[#FFF9ED] px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-amber-700 sm:text-xs sm:tracking-[0.18em]">
                       Risk-informed view
                       </div>
                   </div>
@@ -278,22 +281,22 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                 </section>
               </div>
 
-              <div className="space-y-4">
+              <div className="min-w-0 space-y-4">
                 <Panel
                   title="Top segments at risk"
                   subtitle="Highest observed attrition-rate segments in the selected population."
                 >
-                  <div className="h-[220px]">
+                  <div className="h-[260px] sm:h-[220px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={summarySegments} margin={{ top: 18, right: 14, bottom: 8, left: 8 }}>
+                      <BarChart data={summarySegments} margin={{ top: 18, right: 8, bottom: 8, left: 0 }}>
                         <CartesianGrid stroke="#E7ECE8" vertical={false} />
                         <XAxis
                           dataKey="segment"
-                          tick={{ fontSize: 11 }}
+                          tick={{ fontSize: 10 }}
                           interval={0}
-                          angle={-10}
+                          angle={-24}
                           textAnchor="end"
-                          height={46}
+                          height={60}
                         />
                         <YAxis tickFormatter={(value) => `${value}%`} width={46} tickMargin={8} />
                         <Tooltip formatter={(value: number) => `${value}%`} />
@@ -323,7 +326,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   <CompactTable rows={concentrationRows.slice(0, 4)} />
                 </Panel>
 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid min-w-0 gap-4 md:grid-cols-2">
                   <CompactListCard title="Cautions / Limitations" items={payload.recommendations.cautions} tone="ember" />
                   <CompactListCard title="Monitoring Suggestions" items={payload.recommendations.monitoringSuggestions} tone="ocean" />
                 </div>
@@ -342,9 +345,9 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   Descriptive patterns update with the global filters and help show where observed attrition is concentrated.
                 </p>
               </div>
-              <div className="grid gap-4 xl:grid-cols-2">
+              <div className="grid min-w-0 gap-4 xl:grid-cols-2">
                 <Panel title="Highest attrition segments" subtitle="Ranked by observed attrition rate in the selected population.">
-                  <div className="h-[290px]">
+                  <div className="h-[250px] sm:h-[290px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={topSegments} layout="vertical" margin={{ top: 8, right: 18, bottom: 8, left: 42 }}>
                         <CartesianGrid stroke="#E7ECE8" horizontal={false} />
@@ -368,7 +371,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   title="Population mix"
                   subtitle="Share of the selected population represented by the top risk segments."
                 >
-                  <div className="h-[290px]">
+                  <div className="h-[250px] sm:h-[290px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={topSegments}>
                         <defs>
@@ -378,7 +381,15 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                           </linearGradient>
                         </defs>
                         <CartesianGrid stroke="#E7ECE8" />
-                        <XAxis dataKey="segment" tick={{ fontSize: 11 }} interval={0} angle={-12} textAnchor="end" height={50} />
+                        <XAxis
+                          dataKey="segment"
+                          tick={{ fontSize: 10 }}
+                          interval={0}
+                          angle={-22}
+                          textAnchor="end"
+                          height={64}
+                          tickFormatter={formatShortSegmentLabel}
+                        />
                         <YAxis tickFormatter={(value) => `${value}%`} width={34} />
                         <Tooltip formatter={(value: number) => `${value}%`} />
                         <Area type="monotone" dataKey="shareOfPopulation" stroke="#2B6F8A" fill="url(#mixFill)" />
@@ -388,7 +399,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                 </Panel>
               </div>
 
-              <div className="mt-4 grid gap-4 xl:grid-cols-2">
+              <div className="mt-4 grid min-w-0 gap-4 xl:grid-cols-2">
                 <Panel
                   title="Retention survival curves"
                   subtitle="Retention patterns by the selected grouping, based on tenure-to-exit history."
@@ -407,7 +418,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                       ))}
                     </select>
                   </div>
-                  <div className="h-[290px]">
+                  <div className="h-[250px] sm:h-[290px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={mergeSurvivalSeries(selectedSurvivalSeries)}>
                         <CartesianGrid stroke="#E7ECE8" />
@@ -443,7 +454,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
 
         {selectedTab === "model-scenarios" ? (
           <section aria-label="Model and Scenarios tab" className="space-y-4">
-            <div className="grid gap-4 xl:grid-cols-[1.18fr_0.82fr]">
+            <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]">
               <div className={modelSurfaceClass}>
                 <p className="text-xs uppercase tracking-[0.24em] text-plum">Model + Scenarios</p>
                 <div className="mt-1 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
@@ -454,11 +465,19 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   Modeled effects come from the current Cox proportional hazards analysis. They support prioritization but
                   do not prove causality or justify person-level decisions.
                 </div>
-                <div className="mt-5 h-[290px]">
+                <div className="mt-5 h-[250px] sm:h-[290px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={payload.modelDrivers} margin={{ top: 8, right: 12, bottom: 8, left: 18 }}>
                       <CartesianGrid stroke="#E7ECE8" />
-                      <XAxis dataKey="label" tick={{ fontSize: 12 }} interval={0} angle={-12} textAnchor="end" height={74} />
+                      <XAxis
+                        dataKey="label"
+                        tick={{ fontSize: 10 }}
+                        interval={0}
+                        angle={-18}
+                        textAnchor="end"
+                        height={58}
+                        tickFormatter={formatShortDriverLabel}
+                      />
                       <YAxis />
                       <Tooltip formatter={(value: number) => formatMetric(value)} />
                       <Bar dataKey="hazardRatio" radius={[8, 8, 0, 0]}>
@@ -471,10 +490,10 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                 </div>
                 <div className="mt-5 grid gap-4 md:grid-cols-2">
                   {payload.modelDrivers.map((driver) => (
-                    <article key={driver.key} className="rounded-[22px] border border-slate-200 bg-mist/70 p-4">
-                      <div className="flex items-center justify-between gap-3">
-                        <h3 className="text-base font-semibold text-ink">{driver.label}</h3>
-                        <span className="rounded-full bg-white px-3 py-1 font-mono text-xs text-slate-600">
+                    <article key={driver.key} className="min-w-0 rounded-[22px] border border-slate-200 bg-mist/70 p-4">
+                      <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <h3 className="min-w-0 text-base font-semibold text-ink">{driver.label}</h3>
+                        <span className="w-fit rounded-full bg-white px-3 py-1 font-mono text-xs text-slate-600">
                           HR {formatMetric(driver.hazardRatio)}
                         </span>
                       </div>
@@ -548,6 +567,18 @@ function formatMetric(value: number | null | undefined, digits = 2) {
   return typeof value === "number" && Number.isFinite(value) ? value.toFixed(digits) : "N/A";
 }
 
+function formatShortSegmentLabel(value: string) {
+  return value.length > 12 ? `${value.slice(0, 10)}...` : value;
+}
+
+function formatShortDriverLabel(value: string) {
+  if (value.includes("Research")) return "R&D";
+  if (value.includes("Sales")) return "Sales";
+  if (value.includes("Overtime")) return "Overtime";
+  if (value.includes("Promotion")) return "Promotion";
+  return value.length > 12 ? `${value.slice(0, 10)}...` : value;
+}
+
 function formatGeneratedDate(value: string) {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) {
@@ -564,9 +595,9 @@ function formatGeneratedDate(value: string) {
 
 function MetricBadge({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-3">
-      <p className="text-[11px] uppercase tracking-[0.22em] text-sand/70">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-white">{value}</p>
+    <div className="min-w-0 rounded-[16px] border border-white/10 bg-white/5 px-3 py-2.5 md:rounded-[20px] md:px-4 md:py-3">
+      <p className="text-[10px] uppercase tracking-[0.18em] text-sand/70 md:text-[11px] md:tracking-[0.22em]">{label}</p>
+      <p className="mt-1 break-words text-[13px] font-semibold text-white md:text-sm">{value}</p>
     </div>
   );
 }
@@ -578,22 +609,23 @@ function TabBar({
   selectedTab: DashboardTab;
   onChange: (tab: DashboardTab) => void;
 }) {
-  const tabs: Array<{ id: DashboardTab; label: string }> = [
-    { id: "summary", label: "Summary" },
-    { id: "risk-patterns", label: "Risk Patterns" },
-    { id: "model-scenarios", label: "Model + Scenarios" },
+  const tabs: Array<{ id: DashboardTab; label: string; shortLabel: string }> = [
+    { id: "summary", label: "Summary", shortLabel: "Summary" },
+    { id: "risk-patterns", label: "Risk Patterns", shortLabel: "Risks" },
+    { id: "model-scenarios", label: "Model + Scenarios", shortLabel: "Scenarios" },
   ];
 
   return (
-    <nav aria-label="Dashboard tabs" className="rounded-full border border-white/70 bg-white/82 p-1 shadow-soft backdrop-blur">
-      <div className="grid gap-1 md:grid-cols-3">
+    <nav aria-label="Dashboard tabs" className="rounded-[20px] border border-white/70 bg-white/90 p-1 shadow-soft backdrop-blur md:rounded-full md:bg-white/82">
+      <div className="grid grid-cols-3 gap-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             type="button"
+            aria-label={tab.label}
             aria-pressed={selectedTab === tab.id}
             onClick={() => onChange(tab.id)}
-            className={`rounded-full px-4 py-3 text-sm font-medium transition ${
+            className={`min-h-10 min-w-0 rounded-[16px] px-1.5 py-2 text-xs font-medium leading-tight transition md:rounded-full md:px-4 md:py-3 md:text-sm ${
               selectedTab === tab.id
                 ? tab.id === "summary"
                   ? "bg-pine text-white"
@@ -603,7 +635,8 @@ function TabBar({
                 : "text-slate-600 hover:bg-mist hover:text-ink"
             }`}
           >
-            {tab.label}
+            <span aria-hidden="true" className="md:hidden">{tab.shortLabel}</span>
+            <span aria-hidden="true" className="hidden md:inline">{tab.label}</span>
           </button>
         ))}
       </div>
@@ -631,10 +664,10 @@ function KpiCard({
   } as const;
 
   return (
-    <article className={`rounded-[22px] border border-slate-200 border-t-4 px-4 py-5 ${accentMap[accent]}`}>
-      <p className="text-xs uppercase tracking-[0.22em] text-slate-500">{label}</p>
-      <p className="mt-3 text-3xl font-semibold tracking-tight text-ink">{value}</p>
-      <p className="mt-2 text-sm text-slate-600">{hint}</p>
+    <article className={`min-w-0 rounded-[18px] border border-slate-200 border-t-4 px-4 py-4 md:rounded-[22px] md:py-5 ${accentMap[accent]}`}>
+      <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500 md:text-xs md:tracking-[0.22em]">{label}</p>
+      <p className="mt-2 break-words text-2xl font-semibold tracking-tight text-ink md:mt-3 md:text-3xl">{value}</p>
+      <p className="mt-1.5 break-words text-sm text-slate-600 md:mt-2">{hint}</p>
     </article>
   );
 }
@@ -670,36 +703,36 @@ function OvertimeGapExplorer({
   );
 
   return (
-    <section className="rounded-[24px] border border-ember/20 bg-[linear-gradient(180deg,rgba(244,224,204,0.5),rgba(255,255,255,0.94))] p-5 shadow-soft md:p-6">
+    <section className="min-w-0 rounded-[22px] border border-ember/20 bg-[linear-gradient(180deg,rgba(244,224,204,0.5),rgba(255,255,255,0.94))] p-4 shadow-soft md:rounded-[24px] md:p-6">
       <div className="grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
-        <div>
+        <div className="min-w-0">
           <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-            <div>
+            <div className="min-w-0">
               <p className="text-xs uppercase tracking-[0.24em] text-ember">Interactive retention gap</p>
-              <h2 className="mt-1 text-2xl font-semibold text-ink">Overtime retention gap explorer</h2>
+              <h2 className="mt-1 text-xl font-semibold text-ink md:text-2xl">Overtime retention gap explorer</h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
                 Compare retention by overtime status inside the current population filters and choose the tenure point leaders should plan around.
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid gap-2 sm:flex sm:flex-wrap">
               <button
                 type="button"
                 onClick={onCompare}
-                className="rounded-full border border-ember/25 bg-white px-4 py-2 text-sm font-medium text-ink transition hover:border-ember/50"
+                className="rounded-full border border-ember/25 bg-white px-3 py-2 text-sm font-medium text-ink transition hover:border-ember/50 md:px-4"
               >
                 Compare groups
               </button>
               <button
                 type="button"
                 onClick={onFocusOvertime}
-                className="rounded-full border border-ember bg-ember px-4 py-2 text-sm font-medium text-white transition hover:bg-[#9E4627]"
+                className="rounded-full border border-ember bg-ember px-3 py-2 text-sm font-medium text-white transition hover:bg-[#9E4627] md:px-4"
               >
                 Focus overtime
               </button>
             </div>
           </div>
 
-          <div className="h-[310px]">
+          <div className="h-[250px] sm:h-[280px] md:h-[310px]">
             {canCompare ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={rows} margin={{ top: 12, right: 18, bottom: 12, left: 4 }}>
@@ -720,9 +753,9 @@ function OvertimeGapExplorer({
           </div>
         </div>
 
-        <aside className="rounded-[22px] border border-white/80 bg-white/86 p-5">
-          <div className="flex items-center justify-between gap-3">
-            <div>
+        <aside className="min-w-0 rounded-[20px] border border-white/80 bg-white/86 p-4 md:rounded-[22px] md:p-5">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Planning horizon</p>
               <p className="mt-1 text-sm text-slate-600">Choose a tenure point for the retention gap.</p>
             </div>
@@ -780,9 +813,9 @@ function OvertimeGapExplorer({
 
 function GapMetric({ label, value, tone = "pine" }: { label: string; value: string; tone?: "pine" | "ember" }) {
   return (
-    <div className="rounded-[18px] border border-slate-200 bg-white px-4 py-3">
+    <div className="min-w-0 rounded-[18px] border border-slate-200 bg-white px-4 py-3">
       <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">{label}</p>
-      <p className={`mt-2 text-2xl font-semibold ${tone === "ember" ? "text-ember" : "text-pine"}`}>{value}</p>
+      <p className={`mt-2 break-words text-2xl font-semibold ${tone === "ember" ? "text-ember" : "text-pine"}`}>{value}</p>
     </div>
   );
 }
@@ -795,18 +828,18 @@ function InsightCard({ text, tone }: { text: string; tone: "pine" | "ember" | "o
   } as const;
 
   return (
-    <article className={`rounded-[22px] border p-4 ${toneMap[tone]}`}>
-      <p className="text-sm leading-6 text-slate-700">{text}</p>
+    <article className={`min-w-0 rounded-[22px] border p-4 ${toneMap[tone]}`}>
+      <p className="break-words text-sm leading-6 text-slate-700">{text}</p>
     </article>
   );
 }
 
 function Panel({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-[24px] border border-slate-200 bg-white p-5">
-      <div className="mb-4">
+    <section className="min-w-0 rounded-[24px] border border-slate-200 bg-white p-4 md:p-5">
+      <div className="mb-4 min-w-0">
         <h3 className="text-lg font-semibold text-ink">{title}</h3>
-        <p className="mt-1 text-sm text-slate-600">{subtitle}</p>
+        <p className="mt-1 break-words text-sm text-slate-600">{subtitle}</p>
       </div>
       {children}
     </section>
@@ -823,13 +856,13 @@ function FilterBar({
   onChange: (key: FilterKey, value: string) => void;
 }) {
   return (
-    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {definitions.map((definition) => (
         <label key={definition.key} className="block">
           <span className="mb-1 block text-[11px] uppercase tracking-[0.16em] text-slate-500">{definition.label}</span>
           <select
             aria-label={definition.label}
-            className="w-full rounded-[16px] border border-pine/15 bg-white px-4 py-3 text-sm text-ink shadow-sm outline-none transition focus:border-pine"
+            className="w-full rounded-[14px] border border-pine/15 bg-white px-3 py-2.5 text-sm text-ink shadow-sm outline-none transition focus:border-pine md:rounded-[16px] md:px-4 md:py-3"
             value={filters[definition.key]}
             onChange={(event) => onChange(definition.key, event.target.value)}
           >
@@ -847,27 +880,42 @@ function FilterBar({
 
 function CompactTable({ rows }: { rows: SegmentMetric[] }) {
   return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200">
-      <table className="min-w-full border-collapse text-sm">
-        <thead className="bg-mist text-left text-[11px] uppercase tracking-[0.18em] text-slate-500">
-          <tr>
-            <th className="px-4 py-3">Dimension</th>
-            <th className="px-4 py-3">Segment</th>
-            <th className="px-4 py-3">Rate</th>
-            <th className="px-4 py-3">Attritions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={`${row.dimension}-${row.segment}`} className="border-t border-slate-100">
-              <td className="px-4 py-3 text-slate-500">{row.dimension}</td>
-              <td className="px-4 py-3 font-medium text-ink">{row.segment}</td>
-              <td className="px-4 py-3 text-ember">{row.attritionRate}%</td>
-              <td className="px-4 py-3 text-ink">{row.attritions}</td>
+    <div className="rounded-[20px] border border-slate-200 md:rounded-3xl">
+      <div className="divide-y divide-slate-100 sm:hidden">
+        {rows.map((row) => (
+          <article key={`${row.dimension}-${row.segment}`} className="p-4">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">{row.dimension}</p>
+            <div className="mt-2 flex items-start justify-between gap-3">
+              <p className="min-w-0 break-words text-sm font-semibold text-ink">{row.segment}</p>
+              <p className="shrink-0 text-sm font-semibold text-ember">{row.attritionRate}%</p>
+            </div>
+            <p className="mt-2 text-xs text-slate-500">{row.attritions} attritions</p>
+          </article>
+        ))}
+      </div>
+
+      <div className="hidden overflow-x-auto sm:block">
+        <table className="min-w-full border-collapse text-sm">
+          <thead className="bg-mist text-left text-[11px] uppercase tracking-[0.18em] text-slate-500">
+            <tr>
+              <th className="px-4 py-3">Dimension</th>
+              <th className="px-4 py-3">Segment</th>
+              <th className="px-4 py-3">Rate</th>
+              <th className="px-4 py-3">Attritions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={`${row.dimension}-${row.segment}`} className="border-t border-slate-100">
+                <td className="px-4 py-3 text-slate-500">{row.dimension}</td>
+                <td className="px-4 py-3 font-medium text-ink">{row.segment}</td>
+                <td className="px-4 py-3 text-ember">{row.attritionRate}%</td>
+                <td className="px-4 py-3 text-ink">{row.attritions}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -887,11 +935,11 @@ function CompactListCard({
   } as const;
 
   return (
-    <section className={`rounded-[22px] border p-5 ${toneMap[tone]}`}>
+    <section className={`min-w-0 rounded-[22px] border p-4 md:p-5 ${toneMap[tone]}`}>
       <h3 className="text-base font-semibold text-ink">{title}</h3>
       <ul className="mt-3 space-y-3 pl-5 text-sm leading-6 text-slate-700">
         {items.map((item) => (
-          <li key={item} className="list-disc">
+          <li key={item} className="list-disc break-words">
             {item}
           </li>
         ))}
@@ -909,7 +957,7 @@ function ScenarioPanel({ scenario }: { scenario: ScenarioDefinition }) {
         : "bg-slate-100 text-slate-700";
 
   return (
-    <div className="mt-5 rounded-[24px] border border-slate-200 bg-white p-5">
+    <div className="mt-5 min-w-0 rounded-[24px] border border-slate-200 bg-white p-4 md:p-5">
       <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${badgeTone}`}>
         {scenario.expectedDirection === "decrease"
           ? "Expected pressure decreases"
@@ -917,10 +965,10 @@ function ScenarioPanel({ scenario }: { scenario: ScenarioDefinition }) {
             ? "Mixed directional effect"
             : "Limited effect"}
       </span>
-      <p className="mt-4 text-sm text-slate-700">{scenario.currentState}</p>
-      <p className="mt-3 text-sm font-medium text-ink">{scenario.proposedChange}</p>
-      <p className="mt-4 text-base leading-7 text-ink">{scenario.impactSummary}</p>
-      <p className="mt-4 rounded-[18px] bg-mist px-4 py-3 text-sm text-slate-600">{scenario.caution}</p>
+      <p className="mt-4 break-words text-sm text-slate-700">{scenario.currentState}</p>
+      <p className="mt-3 break-words text-sm font-medium text-ink">{scenario.proposedChange}</p>
+      <p className="mt-4 break-words text-base leading-7 text-ink">{scenario.impactSummary}</p>
+      <p className="mt-4 break-words rounded-[18px] bg-mist px-4 py-3 text-sm text-slate-600">{scenario.caution}</p>
     </div>
   );
 }
@@ -937,11 +985,11 @@ function RecommendationSection({
   const ListTag = ordered ? "ol" : "ul";
 
   return (
-    <section className="rounded-[22px] border border-slate-200 bg-white p-5">
+    <section className="min-w-0 rounded-[22px] border border-slate-200 bg-white p-4 md:p-5">
       <h3 className="text-lg font-semibold text-ink">{title}</h3>
       <ListTag className={`mt-4 space-y-3 ${ordered ? "list-decimal pl-5" : "list-disc pl-5"}`}>
         {items.map((item) => (
-          <li key={item} className="text-sm leading-6 text-slate-700">
+          <li key={item} className="break-words text-sm leading-6 text-slate-700">
             {item}
           </li>
         ))}
@@ -952,9 +1000,9 @@ function RecommendationSection({
 
 function TextPanel({ title, body }: { title: string; body: string }) {
   return (
-    <section className="rounded-[22px] border border-slate-200 bg-white p-5">
+    <section className="min-w-0 rounded-[22px] border border-slate-200 bg-white p-4 md:p-5">
       <h3 className="text-lg font-semibold text-ink">{title}</h3>
-      <p className="mt-3 text-sm leading-6 text-slate-700">{body}</p>
+      <p className="mt-3 break-words text-sm leading-6 text-slate-700">{body}</p>
     </section>
   );
 }
