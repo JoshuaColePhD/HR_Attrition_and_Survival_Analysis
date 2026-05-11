@@ -35,12 +35,12 @@ type ScenarioSelection = "overtime" | "promotion";
 type DashboardTab = "summary" | "risk-patterns" | "model-scenarios";
 
 const surfaceClass =
-  "w-full max-w-full min-w-0 rounded-[18px] border border-white/80 bg-white/88 p-4 shadow-soft backdrop-blur md:rounded-[22px] md:p-5";
-const chartColors = ["#0F6B7A", "#C94F3D", "#F2C744", "#4F6173", "#5B5FC7"];
+  "w-full max-w-full min-w-0 rounded-[3px] border border-[#37577b] bg-[#132a46]/92 p-4 shadow-soft md:p-5";
+const chartColors = ["#5BC0EB", "#F4727A", "#F6C85F", "#9B7EDE", "#4E79A7"];
 const primaryFilterKeys: FilterKey[] = ["department", "jobRoleFamily", "overTime", "tenureBand"];
-const summarySurfaceClass = `${surfaceClass} border-ocean/10 bg-[linear-gradient(180deg,rgba(243,246,250,0.92),rgba(255,255,255,0.96))]`;
-const riskSurfaceClass = `${surfaceClass} border-gold/30 bg-[linear-gradient(180deg,rgba(255,248,222,0.55),rgba(255,255,255,0.96))]`;
-const modelSurfaceClass = `${surfaceClass} border-ocean/15 bg-[linear-gradient(180deg,rgba(231,240,250,0.72),rgba(255,255,255,0.96))]`;
+const summarySurfaceClass = `${surfaceClass}`;
+const riskSurfaceClass = `${surfaceClass}`;
+const modelSurfaceClass = `${surfaceClass}`;
 
 export function DashboardView({ initialPayload }: DashboardViewProps) {
   const [payload, setPayload] = useState(initialPayload);
@@ -118,21 +118,27 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
   return (
     <main className="min-h-screen overflow-x-hidden px-3 py-4 md:px-7 md:py-6">
       <div className="mx-auto w-full max-w-7xl min-w-0">
-        <header className="mb-3 overflow-hidden rounded-[20px] border border-pine/10 bg-ink px-4 py-4 text-white shadow-soft md:rounded-[24px] md:px-6 md:py-5">
-          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <header className="mb-0 overflow-hidden rounded-t-[3px] border border-[#42658d] bg-[#071321] text-white shadow-soft">
+          <div className="flex min-h-12 items-center justify-between gap-3 border-b border-[#345779] bg-[#0a1b2e] px-4 py-2 md:px-6">
+            <div className="flex items-center gap-3">
+              <div className="grid size-8 place-items-center rounded-[2px] border border-gold/50 bg-white/8 text-lg font-semibold text-gold">
+                +
+              </div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold">Tableau-style BI view</p>
+            </div>
+            <p className="hidden text-xs uppercase tracking-[0.18em] text-sand/75 sm:block">People Analytics</p>
+          </div>
+          <div className="flex flex-col gap-4 bg-[linear-gradient(120deg,#0d2037,#1c4771)] px-4 py-5 md:flex-row md:items-end md:justify-between md:px-6 md:py-6">
             <div className="min-w-0 max-w-4xl">
-              <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-sand/75 md:text-[11px] md:tracking-[0.28em]">
-                Executive Attrition Risk Dashboard
-              </p>
-              <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl md:text-[2.35rem]">
-                Workforce retention risk overview.
+              <h1 className="text-balance text-3xl font-semibold uppercase tracking-[0.02em] text-white sm:text-4xl md:text-[2.75rem]">
+                HR Analytics Dashboard
               </h1>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-sand/80">
+              <p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-sand md:text-base">
                 Aggregated attrition insights for business leaders, with action guidance grounded in current risk patterns.
               </p>
             </div>
-            <div className="rounded-[16px] border border-white/10 bg-white/5 px-3 py-2 text-sm text-sand/85 md:min-w-[250px]">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-sand/65">Dashboard view</p>
+            <div className="rounded-[3px] border border-[#6d8db4] bg-[#0b1f35]/80 px-4 py-3 text-sm text-sand md:min-w-[250px]">
+              <p className="text-[10px] uppercase tracking-[0.16em] text-gold">Dashboard view</p>
               <p className="mt-1 font-semibold text-white">{activeFilterCount === 0 ? "Full workforce" : `${activeFilterCount} filtered dimension${activeFilterCount === 1 ? "" : "s"}`}</p>
             </div>
           </div>
@@ -146,64 +152,31 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
           modelConcordance={payload.summary.modelConcordance}
         />
 
-        <div className="sticky top-0 z-10 mb-3 bg-[linear-gradient(180deg,rgba(247,249,252,0.98),rgba(247,249,252,0.84),rgba(247,249,252,0))] pb-2 pt-1 backdrop-blur md:mb-4">
+        <div className="sticky top-0 z-10 mb-3 bg-[linear-gradient(180deg,rgba(8,17,31,0.98),rgba(8,17,31,0.86),rgba(8,17,31,0))] pb-2 pt-2 backdrop-blur md:mb-4">
           <TabBar selectedTab={selectedTab} onChange={setSelectedTab} />
         </div>
 
-        <div className="mb-4">
-          <div className={`${surfaceClass} border-ocean/15 bg-[linear-gradient(180deg,rgba(231,240,250,0.72),rgba(255,255,255,0.96))]`}>
-            <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:mb-4">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Control panel</p>
-                <p className="mt-1 text-sm font-medium text-slate-700">
-                  {activeFilterCount === 0
-                    ? "All employees in view"
-                    : `${activeFilterCount} active filter${activeFilterCount === 1 ? "" : "s"} applied`}
-                </p>
-              </div>
-              <div className="grid gap-2 sm:flex sm:flex-wrap">
-                <button
-                  type="button"
-                  onClick={() => setShowMoreFilters((current) => !current)}
-                  className="rounded-[12px] border border-pine/20 bg-mist px-3 py-2 text-sm text-ink transition hover:border-pine/40 md:px-4"
-                >
-                  {showMoreFilters ? "Fewer filters" : "More filters"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFilters(payload.filters)}
-                  className="rounded-[12px] border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-pine/30 md:px-4"
-                >
-                  Reset filters
-                </button>
-              </div>
-            </div>
-            <FilterBar
-              definitions={primaryDefinitions}
-              filters={filters}
-              onChange={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
-            />
-            {showMoreFilters ? (
-              <div className="mt-3 border-t border-slate-200 pt-3">
-                <FilterBar
-                  definitions={advancedDefinitions}
-                  filters={filters}
-                  onChange={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
-                />
-              </div>
-            ) : null}
-          </div>
-        </div>
-
+        <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
+          <FilterPanel
+            activeFilterCount={activeFilterCount}
+            showMoreFilters={showMoreFilters}
+            onToggleMore={() => setShowMoreFilters((current) => !current)}
+            onReset={() => setFilters(payload.filters)}
+            primaryDefinitions={primaryDefinitions}
+            advancedDefinitions={advancedDefinitions}
+            filters={filters}
+            onChange={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
+          />
+          <div className="min-w-0">
         {selectedTab === "summary" ? (
           <section aria-label="Summary tab" className="space-y-4">
             <div className={summarySurfaceClass}>
               <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.24em] text-pine">Summary</p>
+                  <p className="text-xs uppercase tracking-[0.24em] text-gold">Summary</p>
                   <h2 className="mt-1 text-xl font-semibold text-ink md:text-2xl">Current attrition picture</h2>
                 </div>
-                <p className="max-w-xl text-sm text-slate-600">{payload.recommendations.summary}</p>
+                <p className="max-w-xl text-sm text-sand/80">{payload.recommendations.summary}</p>
               </div>
               <div className="grid gap-3 md:grid-cols-5">
                 <KpiCard label="Employees" value={payload.summary.filteredEmployees} hint="Selected scope" accent="pine" />
@@ -251,10 +224,10 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                 <section className={summarySurfaceClass}>
                   <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
-                      <p className="text-xs uppercase tracking-[0.22em] text-pine">Key drivers</p>
+                      <p className="text-xs uppercase tracking-[0.22em] text-gold">Key drivers</p>
                   <h3 className="mt-1 text-lg font-semibold text-ink md:text-xl">What deserves attention first</h3>
                     </div>
-                      <div className="w-fit max-w-full rounded-[10px] border border-gold/40 bg-[#FFF8DE] px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-amber-700 sm:text-xs sm:tracking-[0.18em]">
+                      <div className="w-fit max-w-full rounded-[4px] border border-[#37577b] bg-mist px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-sand/80 sm:text-xs sm:tracking-[0.18em]">
                       Risk-informed view
                       </div>
                   </div>
@@ -268,10 +241,10 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                 <section className={summarySurfaceClass}>
                   <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                     <div>
-                      <p className="text-xs uppercase tracking-[0.22em] text-pine">Recommended Actions</p>
+                      <p className="text-xs uppercase tracking-[0.22em] text-gold">Recommended Actions</p>
                       <h3 className="mt-1 text-lg font-semibold text-ink md:text-xl">Evidence-based next steps</h3>
                     </div>
-                    <p className="max-w-xl text-sm text-slate-600">{payload.notes.dataScope}</p>
+                    <p className="max-w-xl text-sm text-sand/80">{payload.notes.dataScope}</p>
                   </div>
                   <div className="grid gap-4 xl:grid-cols-[1.08fr_0.92fr]">
                     <RecommendationSection
@@ -295,7 +268,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   <div className="h-[260px] sm:h-[220px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={summarySegments} margin={{ top: 18, right: 8, bottom: 8, left: 0 }}>
-                        <CartesianGrid stroke="#E7ECE8" vertical={false} />
+                        <CartesianGrid stroke="#274766" vertical={false} />
                         <XAxis
                           dataKey="segment"
                           tick={{ fontSize: 10 }}
@@ -311,7 +284,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                             dataKey="attritionRate"
                             position="top"
                             formatter={(value: number) => `${value}%`}
-                            style={{ fill: "#475467", fontSize: 11, fontWeight: 600 }}
+                            style={{ fill: "#D7E4F7", fontSize: 11, fontWeight: 600 }}
                           />
                           {summarySegments.map((segment, index) => (
                             <Cell
@@ -347,7 +320,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
               <div className="mb-4">
                 <p className="text-xs uppercase tracking-[0.24em] text-ember">Risk Patterns</p>
                 <h2 className="mt-1 text-xl font-semibold text-ink md:text-2xl">Segment filters and concentration views</h2>
-                <p className="mt-2 max-w-2xl text-sm text-slate-600">
+                <p className="mt-2 max-w-2xl text-sm text-sand/80">
                   Descriptive patterns update with the global filters and help show where observed attrition is concentrated.
                 </p>
               </div>
@@ -356,15 +329,15 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   <div className="h-[250px] sm:h-[290px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={topSegments} layout="vertical" margin={{ top: 8, right: 18, bottom: 8, left: 42 }}>
-                        <CartesianGrid stroke="#E7ECE8" horizontal={false} />
+                        <CartesianGrid stroke="#274766" horizontal={false} />
                         <XAxis type="number" tickFormatter={(value) => `${value}%`} />
-                        <YAxis type="category" dataKey="segment" width={108} tick={{ fill: "#365A55", fontSize: 12 }} />
+                        <YAxis type="category" dataKey="segment" width={108} tick={{ fill: "#D7E4F7", fontSize: 12 }} />
                         <Tooltip formatter={(value: number) => `${value}%`} />
                         <Bar dataKey="attritionRate" radius={[0, 8, 8, 0]}>
                           {topSegments.map((entry) => (
                             <Cell
                               key={`${entry.dimension}-${entry.segment}`}
-                              fill={entry.dimension === "Overtime" ? "#C94F3D" : entry.dimension === "Business Travel" ? "#5B5FC7" : "#F2C744"}
+                              fill={entry.dimension === "Overtime" ? "#F4727A" : "#5BC0EB"}
                             />
                           ))}
                         </Bar>
@@ -382,11 +355,11 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                       <AreaChart data={topSegments}>
                         <defs>
                           <linearGradient id="mixFill" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#1F77B4" stopOpacity={0.35} />
-                            <stop offset="95%" stopColor="#1F77B4" stopOpacity={0.05} />
+                            <stop offset="5%" stopColor="#5BC0EB" stopOpacity={0.35} />
+                            <stop offset="95%" stopColor="#5BC0EB" stopOpacity={0.04} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid stroke="#E7ECE8" />
+                        <CartesianGrid stroke="#274766" />
                         <XAxis
                           dataKey="segment"
                           tick={{ fontSize: 10 }}
@@ -398,7 +371,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                         />
                         <YAxis tickFormatter={(value) => `${value}%`} width={34} />
                         <Tooltip formatter={(value: number) => `${value}%`} />
-                        <Area type="monotone" dataKey="shareOfPopulation" stroke="#1F77B4" fill="url(#mixFill)" />
+                        <Area type="monotone" dataKey="shareOfPopulation" stroke="#5BC0EB" fill="url(#mixFill)" />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
@@ -427,7 +400,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   <div className="h-[250px] sm:h-[290px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={mergeSurvivalSeries(selectedSurvivalSeries)}>
-                        <CartesianGrid stroke="#E7ECE8" />
+                        <CartesianGrid stroke="#274766" />
                         <XAxis dataKey="tenure" label={{ value: "Years at company", position: "insideBottom", offset: -4 }} />
                         <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} width={38} />
                         <Tooltip formatter={(value: number) => `${value}%`} />
@@ -465,16 +438,16 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                 <p className="text-xs uppercase tracking-[0.24em] text-ocean">Model + Scenarios</p>
                 <div className="mt-1 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                   <h2 className="text-xl font-semibold text-ink md:text-2xl">Why risk may be elevated</h2>
-                  <p className="max-w-xl text-sm text-slate-600">{payload.notes.modelCaution}</p>
+                  <p className="max-w-xl text-sm text-sand/80">{payload.notes.modelCaution}</p>
                 </div>
-                <div className="mt-4 rounded-[16px] border border-gold/40 bg-[#FFF8DE] px-4 py-3 text-sm text-slate-700">
+                <div className="mt-4 rounded-[8px] border border-[#37577b] bg-mist px-4 py-3 text-sm text-sand/90">
                   Modeled effects come from the current Cox proportional hazards analysis. They support prioritization but
                   do not prove causality or justify person-level decisions.
                 </div>
                 <div className="mt-5 h-[250px] sm:h-[290px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={payload.modelDrivers} margin={{ top: 8, right: 12, bottom: 8, left: 18 }}>
-                      <CartesianGrid stroke="#E7ECE8" />
+                      <CartesianGrid stroke="#274766" />
                       <XAxis
                         dataKey="label"
                         tick={{ fontSize: 10 }}
@@ -488,7 +461,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                       <Tooltip formatter={(value: number) => formatMetric(value)} />
                       <Bar dataKey="hazardRatio" radius={[8, 8, 0, 0]}>
                         {payload.modelDrivers.map((driver) => (
-                          <Cell key={driver.key} fill={driver.hazardRatio > 1 ? "#C94F3D" : "#0F6B7A"} />
+                          <Cell key={driver.key} fill={driver.hazardRatio > 1 ? "#F4727A" : "#5BC0EB"} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -496,18 +469,18 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                 </div>
                 <div className="mt-5 grid gap-4 md:grid-cols-2">
                   {payload.modelDrivers.map((driver) => (
-                    <article key={driver.key} className="min-w-0 rounded-[22px] border border-slate-200 bg-mist/70 p-4">
+                    <article key={driver.key} className="min-w-0 rounded-[8px] border border-[#37577b] bg-[#0b1f35] p-4">
                       <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <h3 className="min-w-0 text-base font-semibold text-ink">{driver.label}</h3>
-                        <span className="w-fit rounded-full bg-white px-3 py-1 font-mono text-xs text-slate-600">
+                        <span className="w-fit rounded-full bg-[#0b1f35] px-3 py-1 font-mono text-xs text-sand/80">
                           HR {formatMetric(driver.hazardRatio)}
                         </span>
                       </div>
-                      <p className="mt-2 text-sm leading-6 text-slate-700">{driver.interpretation}</p>
-                      <p className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-500">
+                      <p className="mt-2 text-sm leading-6 text-sand/90">{driver.interpretation}</p>
+                      <p className="mt-3 text-xs uppercase tracking-[0.18em] text-sand/60">
                         95% CI {formatMetric(driver.lowerCi)}-{formatMetric(driver.upperCi)} | p {driver.pValue}
                       </p>
-                      {driver.caution ? <p className="mt-3 text-sm text-amber-700">{driver.caution}</p> : null}
+                      {driver.caution ? <p className="mt-3 text-sm text-gold">{driver.caution}</p> : null}
                     </article>
                   ))}
                 </div>
@@ -516,7 +489,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
               <div className={modelSurfaceClass}>
                 <p className="text-xs uppercase tracking-[0.24em] text-ocean">Scenario Explorer</p>
                 <h2 className="mt-1 text-xl font-semibold text-ink md:text-2xl">What might reduce pressure</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
+                <p className="mt-2 text-sm leading-6 text-sand/80">
                   Aggregate scenarios are designed for staffing and retention planning, not prediction at the employee level.
                 </p>
                 <div className="mt-5 grid gap-3">
@@ -525,14 +498,14 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                       key={scenario.id}
                       type="button"
                       onClick={() => setSelectedScenario(scenario.id)}
-                      className={`rounded-[22px] border px-4 py-4 text-left transition ${
+                      className={`rounded-[8px] border px-4 py-4 text-left transition ${
                         selectedScenario === scenario.id
-                          ? "border-ocean bg-ocean text-white"
-                          : "border-slate-200 bg-[linear-gradient(180deg,rgba(231,240,250,0.55),rgba(255,255,255,0.94))] text-ink hover:border-ocean/40"
+                          ? "border-pine bg-pine text-white"
+                          : "border-[#37577b] bg-[#0b1f35] text-ink hover:border-pine/40"
                       }`}
                     >
                       <p className="text-sm font-semibold">{scenario.label}</p>
-                      <p className={`mt-2 text-sm ${selectedScenario === scenario.id ? "text-sand/85" : "text-slate-600"}`}>
+                      <p className={`mt-2 text-sm ${selectedScenario === scenario.id ? "text-sand/85" : "text-sand/80"}`}>
                         {scenario.currentState}
                       </p>
                     </button>
@@ -543,6 +516,8 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
             </div>
           </section>
         ) : null}
+          </div>
+        </div>
       </div>
     </main>
   );
@@ -621,11 +596,11 @@ function ContextBar({
   ];
 
   return (
-    <div className="mb-3 grid min-w-0 gap-2 rounded-[18px] border border-slate-200 bg-white/92 p-2 shadow-soft md:mb-4 md:grid-cols-5">
+    <div className="mb-3 grid min-w-0 gap-0 border-x border-b border-[#42658d] bg-[#102846] shadow-soft md:mb-4 md:grid-cols-5">
       {items.map((item) => (
-        <div key={item.label} className="min-w-0 rounded-[12px] border border-slate-100 bg-mist/55 px-3 py-2">
-          <p className="text-[10px] uppercase tracking-[0.16em] text-slate-500">{item.label}</p>
-          <p className="mt-1 break-words text-sm font-semibold text-ink">{item.value}</p>
+        <div key={item.label} className="min-w-0 border-b border-[#37577b] px-4 py-3 md:border-b-0 md:border-r last:md:border-r-0">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gold">{item.label}</p>
+          <p className="mt-1 break-words text-xl font-semibold text-white md:text-2xl">{item.value}</p>
         </div>
       ))}
     </div>
@@ -646,7 +621,7 @@ function TabBar({
   ];
 
   return (
-    <nav aria-label="Dashboard tabs" className="rounded-[16px] border border-white/70 bg-white/92 p-1 shadow-soft backdrop-blur md:rounded-[18px]">
+    <nav aria-label="Dashboard tabs" className="rounded-[3px] border border-[#42658d] bg-[#102846] p-1 shadow-soft">
       <div className="grid grid-cols-3 gap-1">
         {tabs.map((tab) => (
           <button
@@ -655,14 +630,14 @@ function TabBar({
             aria-label={tab.label}
             aria-pressed={selectedTab === tab.id}
             onClick={() => onChange(tab.id)}
-            className={`min-h-10 min-w-0 rounded-[12px] px-1.5 py-2 text-xs font-medium leading-tight transition md:px-4 md:py-2.5 md:text-sm ${
+            className={`min-h-10 min-w-0 rounded-[4px] px-1.5 py-2 text-xs font-semibold leading-tight transition md:px-4 md:py-2.5 md:text-sm ${
               selectedTab === tab.id
                 ? tab.id === "summary"
-                  ? "bg-pine text-white"
+                  ? "bg-slateblue text-white"
                   : tab.id === "risk-patterns"
-                    ? "bg-ember text-white"
-                    : "bg-ocean text-white"
-                : "text-slate-600 hover:bg-mist hover:text-ink"
+                    ? "bg-ember text-[#071321]"
+                    : "bg-ocean text-[#071321]"
+                : "text-sand hover:bg-[#19385c] hover:text-white"
             }`}
           >
             <span aria-hidden="true" className="md:hidden">{tab.shortLabel}</span>
@@ -671,6 +646,62 @@ function TabBar({
         ))}
       </div>
     </nav>
+  );
+}
+
+function FilterPanel({
+  activeFilterCount,
+  showMoreFilters,
+  onToggleMore,
+  onReset,
+  primaryDefinitions,
+  advancedDefinitions,
+  filters,
+  onChange,
+}: {
+  activeFilterCount: number;
+  showMoreFilters: boolean;
+  onToggleMore: () => void;
+  onReset: () => void;
+  primaryDefinitions: FilterDefinition[];
+  advancedDefinitions: FilterDefinition[];
+  filters: DashboardFilters;
+  onChange: (key: FilterKey, value: string) => void;
+}) {
+  return (
+    <aside className="min-w-0 rounded-[3px] border border-[#42658d] bg-[#0b1f35] p-4 text-white shadow-soft lg:sticky lg:top-[76px] lg:self-start">
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gold">Filter</p>
+        <p className="rounded-[3px] border border-gold/30 bg-gold/10 px-2 py-1 text-[11px] font-semibold text-gold">
+          {activeFilterCount === 0 ? "All" : `${activeFilterCount} active`}
+        </p>
+      </div>
+
+      <FilterBar definitions={primaryDefinitions} filters={filters} onChange={onChange} variant="rail" />
+
+      {showMoreFilters ? (
+        <div className="mt-4 border-t border-white/20 pt-4">
+          <FilterBar definitions={advancedDefinitions} filters={filters} onChange={onChange} variant="rail" />
+        </div>
+      ) : null}
+
+      <div className="mt-5 grid gap-2">
+        <button
+          type="button"
+          onClick={onToggleMore}
+          className="rounded-[3px] border border-[#5f82aa] bg-[#173c61] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#214d78]"
+        >
+          {showMoreFilters ? "Fewer filters" : "More filters"}
+        </button>
+        <button
+          type="button"
+          onClick={onReset}
+          className="rounded-[3px] border border-gold/50 bg-gold px-3 py-2 text-sm font-semibold text-[#071321] transition hover:bg-[#ffd977]"
+        >
+          Reset filters
+        </button>
+      </div>
+    </aside>
   );
 }
 
@@ -686,18 +717,18 @@ function KpiCard({
   accent: "pine" | "ember" | "gold" | "ocean" | "plum";
 }) {
   const accentMap = {
-    pine: "border-t-pine bg-[linear-gradient(180deg,rgba(217,238,242,0.6),rgba(255,255,255,0.96))]",
-    ember: "border-t-ember bg-[linear-gradient(180deg,rgba(251,228,223,0.68),rgba(255,255,255,0.96))]",
-    gold: "border-t-gold bg-[linear-gradient(180deg,rgba(255,248,222,0.78),rgba(255,255,255,0.96))]",
-    ocean: "border-t-ocean bg-[linear-gradient(180deg,rgba(221,236,248,0.72),rgba(255,255,255,0.96))]",
-    plum: "border-t-slateblue bg-[linear-gradient(180deg,rgba(243,246,250,0.9),rgba(255,255,255,0.96))]",
+    pine: "border-t-ocean bg-[#0b1f35]",
+    ember: "border-t-ember bg-[#0b1f35]",
+    gold: "border-t-gold bg-[#0b1f35]",
+    ocean: "border-t-ocean bg-[#0b1f35]",
+    plum: "border-t-plum bg-[#0b1f35]",
   } as const;
 
   return (
-    <article className={`min-w-0 rounded-[14px] border border-slate-200 border-t-4 px-4 py-3 md:py-4 ${accentMap[accent]}`}>
-      <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500 md:text-[11px] md:tracking-[0.2em]">{label}</p>
-      <p className="mt-2 break-words text-2xl font-semibold tracking-tight text-ink md:text-[1.65rem]">{value}</p>
-      <p className="mt-1 break-words text-xs text-slate-600 md:text-sm">{hint}</p>
+    <article className={`min-w-0 rounded-[3px] border border-[#37577b] border-t-4 px-4 py-3 md:py-4 ${accentMap[accent]}`}>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold md:text-[11px]">{label}</p>
+      <p className="mt-2 break-words text-2xl font-semibold tracking-tight text-white md:text-[1.65rem]">{value}</p>
+      <p className="mt-1 break-words text-xs text-sand/75 md:text-sm">{hint}</p>
     </article>
   );
 }
@@ -733,14 +764,14 @@ function OvertimeGapExplorer({
   );
 
   return (
-    <section className="min-w-0 rounded-[18px] border border-ember/20 bg-[linear-gradient(180deg,rgba(251,228,223,0.45),rgba(255,255,255,0.96))] p-4 shadow-soft md:rounded-[22px] md:p-5">
+    <section className="min-w-0 rounded-[3px] border border-[#37577b] bg-[#0b1f35] p-4 shadow-soft md:p-5">
       <div className="grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
         <div className="min-w-0">
           <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div className="min-w-0">
               <p className="text-xs uppercase tracking-[0.24em] text-ember">Interactive retention gap</p>
               <h2 className="mt-1 text-xl font-semibold text-ink md:text-2xl">Overtime retention gap explorer</h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-sand/80">
                 Compare retention by overtime status inside the current population filters and choose the tenure point leaders should plan around.
               </p>
             </div>
@@ -748,7 +779,7 @@ function OvertimeGapExplorer({
               <button
                 type="button"
                 onClick={onCompare}
-                className="rounded-full border border-ember/25 bg-white px-3 py-2 text-sm font-medium text-ink transition hover:border-ember/50 md:px-4"
+                className="rounded-full border border-ember/25 bg-[#0b1f35] px-3 py-2 text-sm font-medium text-ink transition hover:border-ember/50 md:px-4"
               >
                 Compare groups
               </button>
@@ -766,32 +797,32 @@ function OvertimeGapExplorer({
             {canCompare ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={rows} margin={{ top: 12, right: 18, bottom: 12, left: 4 }}>
-                  <CartesianGrid stroke="#E7ECE8" />
+                  <CartesianGrid stroke="#274766" />
                   <XAxis dataKey="tenure" label={{ value: "Years at company", position: "insideBottom", offset: -6 }} />
                   <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} width={38} />
                   <Tooltip formatter={(value: number) => `${value}% retained`} />
                   <Legend />
-                  <Line type="monotone" dataKey="No" name="No overtime" stroke="#0F6B7A" dot={false} strokeWidth={2.6} />
-                  <Line type="monotone" dataKey="Yes" name="Overtime" stroke="#C94F3D" dot={false} strokeWidth={2.6} />
+                  <Line type="monotone" dataKey="No" name="No overtime" stroke="#5BC0EB" dot={false} strokeWidth={2.6} />
+                  <Line type="monotone" dataKey="Yes" name="Overtime" stroke="#F4727A" dot={false} strokeWidth={2.6} />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex h-full items-center justify-center rounded-[22px] border border-dashed border-ember/30 bg-white/72 p-6 text-center text-sm leading-6 text-slate-600">
+              <div className="flex h-full items-center justify-center rounded-[8px] border border-dashed border-[#5f82aa] bg-[#0b1f35] p-6 text-center text-sm leading-6 text-sand/80">
                 Set Overtime to All to compare both groups within the current population.
               </div>
             )}
           </div>
         </div>
 
-        <aside className="min-w-0 rounded-[20px] border border-white/80 bg-white/86 p-4 md:rounded-[22px] md:p-5">
+        <aside className="min-w-0 rounded-[8px] border border-[#37577b] bg-[#0b1f35] p-4 md:p-5">
           <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
-              <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Planning horizon</p>
-              <p className="mt-1 text-sm text-slate-600">Choose a tenure point for the retention gap.</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-sand/60">Planning horizon</p>
+              <p className="mt-1 text-sm text-sand/80">Choose a tenure point for the retention gap.</p>
             </div>
             <select
               aria-label="Overtime retention planning horizon"
-              className="rounded-full border border-ember/25 bg-[#FFF8DE] px-3 py-2 text-sm font-medium text-ink"
+              className="rounded-[6px] border border-[#37577b] bg-[#0b1f35] px-3 py-2 text-sm font-medium text-ink"
               value={selectedTenure}
               onChange={(event) => onTenureChange(Number(event.target.value))}
             >
@@ -808,30 +839,30 @@ function OvertimeGapExplorer({
             <GapMetric label="Overtime" value={formatGapValue(summary.overtime)} tone="ember" />
           </div>
 
-          <div className="mt-4 rounded-[20px] bg-[#FFF2D0] px-4 py-4">
+          <div className="mt-4 rounded-[8px] bg-mist px-4 py-4">
             <p className="text-xs uppercase tracking-[0.18em] text-ember">Retention gap</p>
             <p className="mt-2 text-3xl font-semibold tracking-tight text-ink">
               {summary.gap === null ? "N/A" : `${summary.gap.toFixed(1)} pts`}
             </p>
-            <p className="mt-2 text-sm leading-6 text-slate-700">
+            <p className="mt-2 text-sm leading-6 text-sand/90">
               {summary.gap === null
                 ? "Both overtime groups are needed for a gap estimate."
                 : `At ${selectedTenure} years, employees reporting overtime retain at a lower modeled rate in this view.`}
             </p>
           </div>
 
-          <div className="mt-4 rounded-[20px] border border-slate-200 bg-mist/70 px-4 py-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Modeled driver</p>
+          <div className="mt-4 rounded-[8px] border border-[#37577b] bg-[#0b1f35] px-4 py-4">
+            <p className="text-xs uppercase tracking-[0.18em] text-sand/60">Modeled driver</p>
             <p className="mt-2 text-lg font-semibold text-ink">
               Overtime HR {hazardRatio ? formatMetric(hazardRatio) : "N/A"}
             </p>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1 text-sm text-sand/80">
               {lowerCi && upperCi ? `95% CI ${formatMetric(lowerCi)}-${formatMetric(upperCi)}` : "Confidence interval unavailable"}
             </p>
           </div>
 
           {overTimeFilter !== "all" ? (
-            <p className="mt-4 rounded-[18px] border border-ember/20 bg-white px-4 py-3 text-sm leading-6 text-ember">
+            <p className="mt-4 rounded-[8px] border border-ember/20 bg-[#0b1f35] px-4 py-3 text-sm leading-6 text-ember">
               Current Overtime filter is {overTimeFilter}. Use Compare groups to restore the direct comparison.
             </p>
           ) : null}
@@ -843,33 +874,33 @@ function OvertimeGapExplorer({
 
 function GapMetric({ label, value, tone = "pine" }: { label: string; value: string; tone?: "pine" | "ember" }) {
   return (
-    <div className="min-w-0 rounded-[14px] border border-slate-200 bg-white px-4 py-3">
-      <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">{label}</p>
-      <p className={`mt-2 break-words text-2xl font-semibold ${tone === "ember" ? "text-ember" : "text-pine"}`}>{value}</p>
+    <div className="min-w-0 rounded-[6px] border border-[#37577b] bg-[#0b1f35] px-4 py-3">
+      <p className="text-[11px] uppercase tracking-[0.16em] text-sand/60">{label}</p>
+      <p className={`mt-2 break-words text-2xl font-semibold ${tone === "ember" ? "text-ember" : "text-ocean"}`}>{value}</p>
     </div>
   );
 }
 
 function InsightCard({ text, tone }: { text: string; tone: "pine" | "ember" | "ocean" }) {
   const toneMap = {
-    pine: "border-pine/25 bg-[linear-gradient(180deg,rgba(217,238,242,0.62),rgba(255,255,255,0.96))]",
-    ember: "border-ember/25 bg-[linear-gradient(180deg,rgba(251,228,223,0.7),rgba(255,255,255,0.96))]",
-    ocean: "border-ocean/25 bg-[linear-gradient(180deg,rgba(221,236,248,0.72),rgba(255,255,255,0.96))]",
+    pine: "border-[#37577b] bg-[#0b1f35]",
+    ember: "border-[#37577b] bg-[#0b1f35]",
+    ocean: "border-[#37577b] bg-[#0b1f35]",
   } as const;
 
   return (
-    <article className={`min-w-0 rounded-[14px] border p-4 ${toneMap[tone]}`}>
-      <p className="break-words text-sm leading-6 text-slate-700">{text}</p>
+    <article className={`min-w-0 rounded-[6px] border p-4 ${toneMap[tone]}`}>
+      <p className="break-words text-sm leading-6 text-sand/90">{text}</p>
     </article>
   );
 }
 
 function Panel({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
   return (
-    <section className="min-w-0 rounded-[16px] border border-slate-200 bg-white p-4 shadow-[0_12px_30px_rgba(16,24,40,0.04)] md:p-5">
-      <div className="mb-4 min-w-0 border-b border-slate-100 pb-3">
+    <section className="min-w-0 rounded-[8px] border border-[#37577b] bg-[#0b1f35] p-4 shadow-[0_8px_18px_rgba(17,24,39,0.04)] md:p-5">
+      <div className="mb-4 min-w-0 border-b border-[#26415f] pb-3">
         <h3 className="text-lg font-semibold text-ink">{title}</h3>
-        <p className="mt-1 break-words text-sm text-slate-600">{subtitle}</p>
+        <p className="mt-1 break-words text-sm text-sand/80">{subtitle}</p>
       </div>
       {children}
     </section>
@@ -880,19 +911,29 @@ function FilterBar({
   definitions,
   filters,
   onChange,
+  variant = "default",
 }: {
   definitions: FilterDefinition[];
   filters: DashboardFilters;
   onChange: (key: FilterKey, value: string) => void;
+  variant?: "default" | "rail";
 }) {
+  const isRail = variant === "rail";
+
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div className={isRail ? "grid gap-4" : "grid gap-3 sm:grid-cols-2 xl:grid-cols-4"}>
       {definitions.map((definition) => (
         <label key={definition.key} className="block">
-          <span className="mb-1 block text-[10px] uppercase tracking-[0.16em] text-slate-500">{definition.label}</span>
+          <span className={`mb-1 block text-[10px] font-semibold uppercase tracking-[0.16em] ${isRail ? "text-white/82" : "text-sand/60"}`}>
+            {definition.label}
+          </span>
           <select
             aria-label={definition.label}
-            className="w-full rounded-[10px] border border-pine/15 bg-white px-3 py-2.5 text-sm text-ink shadow-sm outline-none transition focus:border-pine md:px-3 md:py-2.5"
+            className={`w-full rounded-[6px] border px-3 py-2.5 text-sm shadow-sm outline-none transition md:px-3 md:py-2.5 ${
+              isRail
+                ? "border-white/30 bg-[#0b1f35] text-ink focus:border-white"
+                : "border-[#37577b] bg-[#0b1f35] text-ink focus:border-pine"
+            }`}
             value={filters[definition.key]}
             onChange={(event) => onChange(definition.key, event.target.value)}
           >
@@ -910,23 +951,23 @@ function FilterBar({
 
 function CompactTable({ rows }: { rows: SegmentMetric[] }) {
   return (
-    <div className="rounded-[14px] border border-slate-200 md:rounded-[16px]">
+    <div className="rounded-[8px] border border-[#37577b]">
       <div className="divide-y divide-slate-100 sm:hidden">
         {rows.map((row) => (
           <article key={`${row.dimension}-${row.segment}`} className="p-4">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">{row.dimension}</p>
+            <p className="text-[11px] uppercase tracking-[0.16em] text-sand/60">{row.dimension}</p>
             <div className="mt-2 flex items-start justify-between gap-3">
               <p className="min-w-0 break-words text-sm font-semibold text-ink">{row.segment}</p>
               <p className="shrink-0 text-sm font-semibold text-ember">{row.attritionRate}%</p>
             </div>
-            <p className="mt-2 text-xs text-slate-500">{row.attritions} attritions</p>
+            <p className="mt-2 text-xs text-sand/60">{row.attritions} attritions</p>
           </article>
         ))}
       </div>
 
       <div className="hidden overflow-x-auto sm:block">
         <table className="min-w-full border-collapse text-sm">
-          <thead className="bg-mist text-left text-[11px] uppercase tracking-[0.18em] text-slate-500">
+          <thead className="bg-mist text-left text-[11px] uppercase tracking-[0.18em] text-sand/60">
             <tr>
               <th className="px-4 py-3">Dimension</th>
               <th className="px-4 py-3">Segment</th>
@@ -936,8 +977,8 @@ function CompactTable({ rows }: { rows: SegmentMetric[] }) {
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={`${row.dimension}-${row.segment}`} className="border-t border-slate-100">
-                <td className="px-4 py-3 text-slate-500">{row.dimension}</td>
+              <tr key={`${row.dimension}-${row.segment}`} className="border-t border-[#26415f]">
+                <td className="px-4 py-3 text-sand/60">{row.dimension}</td>
                 <td className="px-4 py-3 font-medium text-ink">{row.segment}</td>
                 <td className="px-4 py-3 text-ember">{row.attritionRate}%</td>
                 <td className="px-4 py-3 text-ink">{row.attritions}</td>
@@ -960,14 +1001,14 @@ function CompactListCard({
   tone: "ember" | "ocean";
 }) {
   const toneMap = {
-    ember: "border-ember/25 bg-[linear-gradient(180deg,rgba(251,228,223,0.7),rgba(255,255,255,0.96))]",
-    ocean: "border-ocean/25 bg-[linear-gradient(180deg,rgba(221,236,248,0.72),rgba(255,255,255,0.96))]",
+    ember: "border-[#37577b] bg-[#0b1f35]",
+    ocean: "border-[#37577b] bg-[#0b1f35]",
   } as const;
 
   return (
-    <section className={`min-w-0 rounded-[16px] border p-4 md:p-5 ${toneMap[tone]}`}>
+    <section className={`min-w-0 rounded-[3px] border p-4 md:p-5 ${toneMap[tone]}`}>
       <h3 className="text-base font-semibold text-ink">{title}</h3>
-      <ul className="mt-3 space-y-3 pl-5 text-sm leading-6 text-slate-700">
+      <ul className="mt-3 space-y-3 pl-5 text-sm leading-6 text-sand/90">
         {items.map((item) => (
           <li key={item} className="list-disc break-words">
             {item}
@@ -981,13 +1022,13 @@ function CompactListCard({
 function ScenarioPanel({ scenario }: { scenario: ScenarioDefinition }) {
   const badgeTone =
     scenario.expectedDirection === "decrease"
-      ? "bg-[#D9EEF2] text-pine"
+      ? "bg-mist text-ocean"
       : scenario.expectedDirection === "mixed"
-        ? "bg-[#FFF2D0] text-ember"
-        : "bg-slate-100 text-slate-700";
+        ? "bg-mist text-ember"
+        : "bg-[#1b3554] text-sand/90";
 
   return (
-    <div className="mt-5 min-w-0 rounded-[16px] border border-slate-200 bg-white p-4 md:p-5">
+    <div className="mt-5 min-w-0 rounded-[8px] border border-[#37577b] bg-[#0b1f35] p-4 md:p-5">
       <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${badgeTone}`}>
         {scenario.expectedDirection === "decrease"
           ? "Expected pressure decreases"
@@ -995,10 +1036,10 @@ function ScenarioPanel({ scenario }: { scenario: ScenarioDefinition }) {
             ? "Mixed directional effect"
             : "Limited effect"}
       </span>
-      <p className="mt-4 break-words text-sm text-slate-700">{scenario.currentState}</p>
+      <p className="mt-4 break-words text-sm text-sand/90">{scenario.currentState}</p>
       <p className="mt-3 break-words text-sm font-medium text-ink">{scenario.proposedChange}</p>
       <p className="mt-4 break-words text-base leading-7 text-ink">{scenario.impactSummary}</p>
-      <p className="mt-4 break-words rounded-[18px] bg-mist px-4 py-3 text-sm text-slate-600">{scenario.caution}</p>
+      <p className="mt-4 break-words rounded-[8px] bg-mist px-4 py-3 text-sm text-sand/80">{scenario.caution}</p>
     </div>
   );
 }
@@ -1015,11 +1056,11 @@ function RecommendationSection({
   const ListTag = ordered ? "ol" : "ul";
 
   return (
-    <section className="min-w-0 rounded-[16px] border border-slate-200 bg-white p-4 md:p-5">
+    <section className="min-w-0 rounded-[8px] border border-[#37577b] bg-[#0b1f35] p-4 md:p-5">
       <h3 className="text-lg font-semibold text-ink">{title}</h3>
       <ListTag className={`mt-4 space-y-3 ${ordered ? "list-decimal pl-5" : "list-disc pl-5"}`}>
         {items.map((item) => (
-          <li key={item} className="break-words text-sm leading-6 text-slate-700">
+          <li key={item} className="break-words text-sm leading-6 text-sand/90">
             {item}
           </li>
         ))}
@@ -1030,9 +1071,9 @@ function RecommendationSection({
 
 function TextPanel({ title, body }: { title: string; body: string }) {
   return (
-    <section className="min-w-0 rounded-[16px] border border-slate-200 bg-white p-4 md:p-5">
+    <section className="min-w-0 rounded-[8px] border border-[#37577b] bg-[#0b1f35] p-4 md:p-5">
       <h3 className="text-lg font-semibold text-ink">{title}</h3>
-      <p className="mt-3 break-words text-sm leading-6 text-slate-700">{body}</p>
+      <p className="mt-3 break-words text-sm leading-6 text-sand/90">{body}</p>
     </section>
   );
 }

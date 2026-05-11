@@ -19,10 +19,9 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at top left, rgba(242, 199, 68, 0.16), transparent 24%),
-    radial-gradient(circle at top right, rgba(31, 119, 180, 0.12), transparent 22%),
-    linear-gradient(180deg, #f7f9fc 0%, #e9edf3 100%);
-  color: #152033;
+    radial-gradient(circle at 18% 12%, rgba(91, 192, 235, 0.16), transparent 26rem),
+    linear-gradient(135deg, #08111f 0%, #10213a 48%, #07101d 100%);
+  color: #f8fafc;
   font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
 }
 
@@ -39,6 +38,19 @@ select {
 .recharts-wrapper,
 .recharts-surface {
   max-width: 100%;
+}
+
+.recharts-cartesian-axis-tick-value,
+.recharts-label,
+.recharts-legend-item-text {
+  fill: #d7e4f7;
+  color: #d7e4f7 !important;
+}
+
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  border-color: #42658d !important;
+  background: #071321 !important;
+  color: #f8fafc !important;
 }
 
 .data-grid {
