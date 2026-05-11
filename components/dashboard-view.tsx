@@ -12,6 +12,8 @@ import {
   LabelList,
   Line,
   LineChart,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -99,6 +101,14 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
 
   const topSegments = useMemo(() => payload.segmentMetrics.slice(0, 8), [payload.segmentMetrics]);
   const summarySegments = useMemo(() => payload.segmentMetrics.slice(0, 5), [payload.segmentMetrics]);
+  const departmentSegments = useMemo(
+    () => payload.segmentMetrics.filter((item) => item.dimension === "Department"),
+    [payload.segmentMetrics],
+  );
+  const jobRoleSegments = useMemo(
+    () => payload.segmentMetrics.filter((item) => item.dimension === "Job Role Family").slice(0, 5),
+    [payload.segmentMetrics],
+  );
   const concentrationRows = useMemo(() => payload.concentrationTable.slice(0, 6), [payload.concentrationTable]);
   const survivalDimensionOptions = Object.keys(payload.survival.byDimension);
   const selectedScenarioDetails =
@@ -107,6 +117,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
   const overtimeSeries = payload.survival.byDimension.OverTime ?? [];
   const overtimeDriver = payload.modelDrivers.find((driver) => driver.key === "OverTimeYes");
   const overtimeGapRows = useMemo(() => mergeSurvivalSeries(overtimeSeries), [overtimeSeries]);
+  const overallSurvivalRows = useMemo(() => mergeSurvivalSeries(payload.survival.overall), [payload.survival.overall]);
   const overtimeGapSummary = useMemo(
     () => buildOvertimeGapSummary(overtimeSeries, selectedGapTenure),
     [overtimeSeries, selectedGapTenure],
@@ -114,208 +125,237 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
   const activeFilterCount = countActiveFilters(filters);
   const primaryDefinitions = payload.filterDefinitions.filter((definition) => primaryFilterKeys.includes(definition.key));
   const advancedDefinitions = payload.filterDefinitions.filter((definition) => !primaryFilterKeys.includes(definition.key));
+  const departmentDefinition = payload.filterDefinitions.find((definition) => definition.key === "department");
+  const filterPanel = (
+    <FilterPanel
+      activeFilterCount={activeFilterCount}
+      showMoreFilters={showMoreFilters}
+      onToggleMore={() => setShowMoreFilters((current) => !current)}
+      onReset={() => setFilters(payload.filters)}
+      primaryDefinitions={primaryDefinitions}
+      advancedDefinitions={advancedDefinitions}
+      filters={filters}
+      onChange={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
+    />
+  );
 
   return (
     <main className="min-h-screen overflow-x-hidden px-3 py-4 md:px-7 md:py-6">
       <div className="mx-auto w-full max-w-7xl min-w-0">
-        <header className="mb-0 overflow-hidden rounded-t-[3px] border border-[#42658d] bg-[#071321] text-white shadow-soft">
-          <div className="flex min-h-12 items-center justify-between gap-3 border-b border-[#345779] bg-[#0a1b2e] px-4 py-2 md:px-6">
-            <div className="flex items-center gap-3">
-              <div className="grid size-8 place-items-center rounded-[2px] border border-gold/50 bg-white/8 text-lg font-semibold text-gold">
-                +
+        {selectedTab === "summary" ? null : (
+          <header className="mb-0 overflow-hidden rounded-t-[3px] border border-[#42658d] bg-[#071321] text-white shadow-soft">
+            <div className="flex min-h-12 items-center justify-between gap-3 border-b border-[#345779] bg-[#0a1b2e] px-4 py-2 md:px-6">
+              <div className="flex items-center gap-3">
+                <div className="grid size-8 place-items-center rounded-[2px] border border-gold/50 bg-white/8 text-lg font-semibold text-gold">
+                  +
+                </div>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold">Tableau-style BI view</p>
               </div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold">Tableau-style BI view</p>
+              <p className="hidden text-xs uppercase tracking-[0.18em] text-sand/75 sm:block">People Analytics</p>
             </div>
-            <p className="hidden text-xs uppercase tracking-[0.18em] text-sand/75 sm:block">People Analytics</p>
-          </div>
-          <div className="flex flex-col gap-4 bg-[linear-gradient(120deg,#0d2037,#1c4771)] px-4 py-5 md:flex-row md:items-end md:justify-between md:px-6 md:py-6">
-            <div className="min-w-0 max-w-4xl">
-              <h1 className="text-balance text-3xl font-semibold uppercase tracking-[0.02em] text-white sm:text-4xl md:text-[2.75rem]">
-                HR Analytics Dashboard
-              </h1>
-              <p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-sand md:text-base">
-                Aggregated attrition insights for business leaders, with action guidance grounded in current risk patterns.
-              </p>
+            <div className="flex flex-col gap-4 bg-[linear-gradient(120deg,#0d2037,#1c4771)] px-4 py-5 md:flex-row md:items-end md:justify-between md:px-6 md:py-6">
+              <div className="min-w-0 max-w-4xl">
+                <h1 className="text-balance text-3xl font-semibold uppercase tracking-[0.02em] text-white sm:text-4xl md:text-[2.75rem]">
+                  HR Analytics Dashboard
+                </h1>
+                <p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-sand md:text-base">
+                  Aggregated attrition insights for business leaders, with action guidance grounded in current risk patterns.
+                </p>
+              </div>
+              <div className="rounded-[3px] border border-[#6d8db4] bg-[#0b1f35]/80 px-4 py-3 text-sm text-sand md:min-w-[250px]">
+                <p className="text-[10px] uppercase tracking-[0.16em] text-gold">Dashboard view</p>
+                <p className="mt-1 font-semibold text-white">{activeFilterCount === 0 ? "Full workforce" : `${activeFilterCount} filtered dimension${activeFilterCount === 1 ? "" : "s"}`}</p>
+              </div>
             </div>
-            <div className="rounded-[3px] border border-[#6d8db4] bg-[#0b1f35]/80 px-4 py-3 text-sm text-sand md:min-w-[250px]">
-              <p className="text-[10px] uppercase tracking-[0.16em] text-gold">Dashboard view</p>
-              <p className="mt-1 font-semibold text-white">{activeFilterCount === 0 ? "Full workforce" : `${activeFilterCount} filtered dimension${activeFilterCount === 1 ? "" : "s"}`}</p>
-            </div>
-          </div>
-        </header>
+          </header>
+        )}
 
-        <ContextBar
-          employees={payload.summary.filteredEmployees}
-          attritions={payload.summary.filteredAttritions}
-          activeFilterCount={activeFilterCount}
-          generatedAt={payload.generatedAt}
-          modelConcordance={payload.summary.modelConcordance}
-        />
-
-        <div className="sticky top-0 z-10 mb-3 bg-[linear-gradient(180deg,rgba(8,17,31,0.98),rgba(8,17,31,0.86),rgba(8,17,31,0))] pb-2 pt-2 backdrop-blur md:mb-4">
-          <TabBar selectedTab={selectedTab} onChange={setSelectedTab} />
-        </div>
-
-        <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
-          <FilterPanel
+        {selectedTab === "summary" ? null : (
+          <ContextBar
+            employees={payload.summary.filteredEmployees}
+            attritions={payload.summary.filteredAttritions}
             activeFilterCount={activeFilterCount}
-            showMoreFilters={showMoreFilters}
-            onToggleMore={() => setShowMoreFilters((current) => !current)}
-            onReset={() => setFilters(payload.filters)}
-            primaryDefinitions={primaryDefinitions}
-            advancedDefinitions={advancedDefinitions}
-            filters={filters}
-            onChange={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
+            generatedAt={payload.generatedAt}
+            modelConcordance={payload.summary.modelConcordance}
           />
-          <div className="min-w-0">
+        )}
+
+        {selectedTab === "summary" ? null : (
+          <div className="sticky top-0 z-10 mb-3 bg-[linear-gradient(180deg,rgba(8,17,31,0.98),rgba(8,17,31,0.86),rgba(8,17,31,0))] pb-2 pt-2 backdrop-blur md:mb-4">
+            <TabBar selectedTab={selectedTab} onChange={setSelectedTab} />
+          </div>
+        )}
+
         {selectedTab === "summary" ? (
-          <section aria-label="Summary tab" className="space-y-4">
-            <div className={summarySurfaceClass}>
-              <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.24em] text-gold">Summary</p>
-                  <h2 className="mt-1 text-xl font-semibold text-ink md:text-2xl">Current attrition picture</h2>
+          <section
+            aria-label="Summary tab"
+            className="overflow-hidden rounded-[3px] border border-[#42658d] bg-[radial-gradient(circle_at_25%_45%,rgba(23,146,161,0.35),transparent_28rem),linear-gradient(135deg,#05345a_0%,#07556a_48%,#08203b_100%)] p-4 shadow-soft"
+          >
+            <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+              <div>
+                <h2 className="text-2xl font-semibold uppercase tracking-[0.02em] text-[#48a8ff] md:text-3xl">
+                  HR Analytics Dashboard
+                </h2>
+                <p className="mt-1 max-w-2xl text-sm text-sand/85">{payload.recommendations.summary}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {[
+                    { id: "summary" as DashboardTab, label: "Summary" },
+                    { id: "risk-patterns" as DashboardTab, label: "Risk Patterns" },
+                    { id: "model-scenarios" as DashboardTab, label: "Model + Scenarios" },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      aria-label={tab.label}
+                      aria-pressed={selectedTab === tab.id}
+                      onClick={() => setSelectedTab(tab.id)}
+                      className={`rounded-[2px] border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] transition ${
+                        selectedTab === tab.id
+                          ? "border-[#4aa8ff] bg-[#1477c8] text-white"
+                          : "border-[#4d8abb] bg-[#10385f] text-sand hover:border-[#7bbdff]"
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
                 </div>
-                <p className="max-w-xl text-sm text-sand/80">{payload.recommendations.summary}</p>
               </div>
-              <div className="grid gap-3 md:grid-cols-5">
-                <KpiCard label="Employees" value={payload.summary.filteredEmployees} hint="Selected scope" accent="pine" />
-                <KpiCard
-                  label="Attrition Rate"
-                  value={`${toPercent(payload.summary.filteredAttritions, payload.summary.filteredEmployees)}%`}
-                  hint={`Overall baseline ${payload.summary.attritionRate}%`}
-                  accent="ember"
-                />
-                <KpiCard
-                  label="Observed Attritions"
-                  value={payload.summary.filteredAttritions}
-                  hint="Historical exits in view"
-                  accent="gold"
-                />
-                <KpiCard
-                  label="Overtime Share"
-                  value={`${toPercentFromMetric(
-                    getMetric(payload.segmentMetrics, "Overtime", "Yes")?.employees ?? 0,
-                    payload.summary.filteredEmployees,
-                  )}%`}
-                  hint="Current filtered population"
-                  accent="ocean"
-                />
-                <KpiCard label="Median Tenure" value={`${payload.summary.medianTenure} yrs`} hint="Org-wide baseline" accent="plum" />
+              <div className="grid gap-2 sm:grid-cols-2 lg:flex lg:flex-wrap lg:justify-end">
+                {departmentDefinition?.options.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setFilters((current) => ({ ...current, department: option.value }))}
+                    className={`min-h-9 min-w-0 rounded-[2px] border px-4 py-2 text-xs font-semibold transition ${
+                      filters.department === option.value
+                        ? "border-[#4aa8ff] bg-[#1477c8] text-white"
+                        : "border-[#4d8abb] bg-[#10385f] text-sand hover:border-[#7bbdff]"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            <OvertimeGapExplorer
-              rows={overtimeGapRows}
-              series={overtimeSeries}
-              selectedTenure={selectedGapTenure}
-              onTenureChange={setSelectedGapTenure}
-              summary={overtimeGapSummary}
-              hazardRatio={overtimeDriver?.hazardRatio}
-              lowerCi={overtimeDriver?.lowerCi}
-              upperCi={overtimeDriver?.upperCi}
-              overTimeFilter={filters.overTime}
-              onCompare={() => setFilters((current) => ({ ...current, overTime: "all" }))}
-              onFocusOvertime={() => setFilters((current) => ({ ...current, overTime: "Yes" }))}
-            />
+            <div className="mb-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
+              <KpiCard label="Count of Employee" value={payload.summary.filteredEmployees} hint="Selected scope" accent="pine" />
+              <KpiCard label="Attrition" value={payload.summary.filteredAttritions} hint="Observed exits" accent="ember" />
+              <KpiCard
+                label="AttritionRate"
+                value={`${toPercent(payload.summary.filteredAttritions, payload.summary.filteredEmployees)}%`}
+                hint={`Baseline ${payload.summary.attritionRate}%`}
+                accent="gold"
+              />
+              <KpiCard label="Model C-index" value={payload.summary.modelConcordance.toFixed(2)} hint="Discrimination" accent="ocean" />
+              <KpiCard
+                label="Overtime Share"
+                value={`${toPercentFromMetric(
+                  getMetric(payload.segmentMetrics, "Overtime", "Yes")?.employees ?? 0,
+                  payload.summary.filteredEmployees,
+                )}%`}
+                hint="Current view"
+                accent="plum"
+              />
+              <KpiCard label="Avg Years" value={payload.summary.medianTenure.toFixed(1)} hint="Median tenure" accent="pine" />
+            </div>
 
-            <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-              <div className="min-w-0 space-y-4">
-                <section className={summarySurfaceClass}>
-                  <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="min-w-0">
-                      <p className="text-xs uppercase tracking-[0.22em] text-gold">Key drivers</p>
-                  <h3 className="mt-1 text-lg font-semibold text-ink md:text-xl">What deserves attention first</h3>
-                    </div>
-                      <div className="w-fit max-w-full rounded-[4px] border border-[#37577b] bg-mist px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-sand/80 sm:text-xs sm:tracking-[0.18em]">
-                      Risk-informed view
-                      </div>
-                  </div>
-                  <div className="mt-4 grid gap-3 md:grid-cols-3">
-                    {payload.recommendations.keyDrivers.slice(0, 3).map((item, index) => (
-                      <InsightCard key={item} text={item} tone={index % 3 === 0 ? "pine" : index % 3 === 1 ? "ember" : "ocean"} />
-                    ))}
-                  </div>
-                </section>
-
-                <section className={summarySurfaceClass}>
-                  <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.22em] text-gold">Recommended Actions</p>
-                      <h3 className="mt-1 text-lg font-semibold text-ink md:text-xl">Evidence-based next steps</h3>
-                    </div>
-                    <p className="max-w-xl text-sm text-sand/80">{payload.notes.dataScope}</p>
-                  </div>
-                  <div className="grid gap-4 xl:grid-cols-[1.08fr_0.92fr]">
-                    <RecommendationSection
-                      title="Recommended actions"
-                      items={payload.recommendations.recommendedActions}
-                      ordered
-                    />
-                    <div className="space-y-4">
-                      <TextPanel title="Manager Guidance" body={payload.recommendations.managerGuidance} />
-                      <TextPanel title="HR / Leadership Guidance" body={payload.recommendations.hrLeadershipGuidance} />
-                    </div>
-                  </div>
-                </section>
-              </div>
-
-              <div className="min-w-0 space-y-4">
-                <Panel
-                  title="Top segments at risk"
-                  subtitle="Highest observed attrition-rate segments in the selected population."
-                >
-                  <div className="h-[260px] sm:h-[220px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={summarySegments} margin={{ top: 18, right: 8, bottom: 8, left: 0 }}>
-                        <CartesianGrid stroke="#274766" vertical={false} />
-                        <XAxis
-                          dataKey="segment"
-                          tick={{ fontSize: 10 }}
-                          interval={0}
-                          angle={-24}
-                          textAnchor="end"
-                          height={60}
-                        />
-                        <YAxis tickFormatter={(value) => `${value}%`} width={46} tickMargin={8} />
-                        <Tooltip formatter={(value: number) => `${value}%`} />
-                        <Bar dataKey="attritionRate" radius={[8, 8, 0, 0]}>
-                          <LabelList
-                            dataKey="attritionRate"
-                            position="top"
-                            formatter={(value: number) => `${value}%`}
-                            style={{ fill: "#D7E4F7", fontSize: 11, fontWeight: 600 }}
-                          />
-                          {summarySegments.map((segment, index) => (
-                            <Cell
-                              key={`${segment.dimension}-${segment.segment}`}
-                              fill={chartColors[index % chartColors.length]}
-                            />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </Panel>
-
-                <Panel
-                  title="Hotspot table"
-                  subtitle="Short list of the most concentrated attrition hotspots in the selected population."
-                >
-                  <CompactTable rows={concentrationRows.slice(0, 4)} />
-                </Panel>
-
-                <div className="grid min-w-0 gap-4 md:grid-cols-2">
-                  <CompactListCard title="Cautions / Limitations" items={payload.recommendations.cautions} tone="ember" />
-                  <CompactListCard title="Monitoring Suggestions" items={payload.recommendations.monitoringSuggestions} tone="ocean" />
+            <div className="grid min-w-0 gap-4 xl:grid-cols-3">
+              <Panel title="Attrition by Department" subtitle="Observed attritions by department.">
+                <div className="h-[230px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={departmentSegments}
+                        dataKey="attritions"
+                        nameKey="segment"
+                        innerRadius="48%"
+                        outerRadius="78%"
+                        paddingAngle={2}
+                      >
+                        {departmentSegments.map((segment, index) => (
+                          <Cell key={segment.segment} fill={chartColors[index % chartColors.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value: number) => `${value} attritions`} />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
-              </div>
+              </Panel>
+
+              <Panel title="Attrition by Year at Company" subtitle="Retention pattern across tenure.">
+                <div className="h-[230px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={overallSurvivalRows}>
+                      <CartesianGrid stroke="#2b6687" />
+                      <XAxis dataKey="tenure" />
+                      <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+                      <Tooltip formatter={(value: number) => `${value}% retained`} />
+                      <Area type="monotone" dataKey="Overall" stroke="#9B7EDE" fill="#9B7EDE" fillOpacity={0.55} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </Panel>
+
+              <Panel title="Hotspot table" subtitle="Most concentrated attrition hotspots.">
+                <CompactTable rows={concentrationRows.slice(0, 5)} />
+              </Panel>
+
+              <Panel title="Attrition by Segment" subtitle="Highest observed segment rates.">
+                <div className="h-[230px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={summarySegments} layout="vertical" margin={{ top: 8, right: 18, bottom: 8, left: 74 }}>
+                      <CartesianGrid stroke="#2b6687" horizontal={false} />
+                      <XAxis type="number" tickFormatter={(value) => `${value}%`} />
+                      <YAxis type="category" dataKey="segment" width={104} tick={{ fill: "#F8FAFC", fontSize: 11 }} />
+                      <Tooltip formatter={(value: number) => `${value}%`} />
+                      <Bar dataKey="attritionRate" fill="#168ef2" radius={[0, 4, 4, 0]}>
+                        <LabelList dataKey="attritionRate" position="right" formatter={(value: number) => `${value}%`} />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </Panel>
+
+              <Panel title="Overtime Survival" subtitle="Retention by overtime status.">
+                <div className="h-[230px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={overtimeGapRows}>
+                      <CartesianGrid stroke="#2b6687" />
+                      <XAxis dataKey="tenure" />
+                      <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+                      <Tooltip formatter={(value: number) => `${value}% retained`} />
+                      <Legend />
+                      <Line type="monotone" dataKey="No" name="No overtime" stroke="#43a7f5" dot={false} strokeWidth={2.4} />
+                      <Line type="monotone" dataKey="Yes" name="Overtime" stroke="#b0a5d9" dot={false} strokeWidth={2.4} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </Panel>
+
+              <Panel title="Attrition by Job Role" subtitle="Job families with the highest observed rates.">
+                <div className="h-[230px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={jobRoleSegments} layout="vertical" margin={{ top: 8, right: 18, bottom: 8, left: 92 }}>
+                      <CartesianGrid stroke="#2b6687" horizontal={false} />
+                      <XAxis type="number" tickFormatter={(value) => `${value}%`} />
+                      <YAxis type="category" dataKey="segment" width={122} tick={{ fill: "#F8FAFC", fontSize: 11 }} />
+                      <Tooltip formatter={(value: number) => `${value}%`} />
+                      <Bar dataKey="attritionRate" fill="#168ef2" radius={[0, 4, 4, 0]}>
+                        <LabelList dataKey="attritionRate" position="right" formatter={(value: number) => `${value}%`} />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </Panel>
             </div>
           </section>
         ) : null}
 
         {selectedTab === "risk-patterns" ? (
-          <section aria-label="Risk Patterns tab" className="space-y-4">
+          <section aria-label="Risk Patterns tab" className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
+            {filterPanel}
             <div className={riskSurfaceClass}>
               <div className="mb-4">
                 <p className="text-xs uppercase tracking-[0.24em] text-ember">Risk Patterns</p>
@@ -432,7 +472,8 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
         ) : null}
 
         {selectedTab === "model-scenarios" ? (
-          <section aria-label="Model and Scenarios tab" className="space-y-4">
+          <section aria-label="Model and Scenarios tab" className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
+            {filterPanel}
             <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]">
               <div className={modelSurfaceClass}>
                 <p className="text-xs uppercase tracking-[0.24em] text-ocean">Model + Scenarios</p>
@@ -516,8 +557,6 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
             </div>
           </section>
         ) : null}
-          </div>
-        </div>
       </div>
     </main>
   );

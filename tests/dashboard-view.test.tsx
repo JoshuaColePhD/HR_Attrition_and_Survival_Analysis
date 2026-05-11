@@ -39,11 +39,13 @@ afterEach(() => {
 });
 
 describe("DashboardView", () => {
-  it("opens on the summary tab by default and keeps recommended actions visible", async () => {
+  it("opens on the summary tab by default and shows the compact BI board", async () => {
     render(<DashboardView initialPayload={latestPayload} />);
 
     expect(screen.getByLabelText("Summary tab")).toBeInTheDocument();
-    expect(screen.getAllByText(/Recommended actions/i).length).toBeGreaterThan(0);
+    expect(screen.getByText("Count of Employee")).toBeInTheDocument();
+    expect(screen.getByText("Attrition by Department")).toBeInTheDocument();
+    expect(screen.getByText("Attrition by Job Role")).toBeInTheDocument();
     expect(screen.queryByLabelText("Risk Patterns tab")).not.toBeInTheDocument();
   });
 
@@ -55,7 +57,7 @@ describe("DashboardView", () => {
 
     expect(screen.getByLabelText("Risk Patterns tab")).toBeInTheDocument();
     expect(screen.getByLabelText("Survival grouping")).toBeInTheDocument();
-    expect(screen.queryByText(/Evidence-based next steps/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Attrition by Job Role/i)).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Model + Scenarios" }));
 
@@ -67,7 +69,7 @@ describe("DashboardView", () => {
     const user = userEvent.setup();
     render(<DashboardView initialPayload={latestPayload} />);
 
-    await user.selectOptions(screen.getByLabelText("Department"), "Sales");
+    await user.click(screen.getByRole("button", { name: "Sales" }));
     await user.click(screen.getByRole("button", { name: "Risk Patterns" }));
 
     await waitFor(() => {
@@ -81,32 +83,27 @@ describe("DashboardView", () => {
     const user = userEvent.setup();
     render(<DashboardView initialPayload={latestPayload} />);
 
+    await user.click(screen.getByRole("button", { name: "Risk Patterns" }));
     expect(screen.queryByLabelText("Business Travel")).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "More filters" }));
     expect(screen.getByLabelText("Business Travel")).toBeInTheDocument();
   });
 
-  it("lets leaders interact with the overtime retention gap explorer", async () => {
+  it("lets leaders filter the BI board with department buttons", async () => {
     const user = userEvent.setup();
     render(<DashboardView initialPayload={latestPayload} />);
 
-    expect(screen.getByText("Overtime retention gap explorer")).toBeInTheDocument();
-    expect(screen.getByText(/Overtime HR 3.07/i)).toBeInTheDocument();
-
-    await user.selectOptions(screen.getByLabelText("Overtime retention planning horizon"), "3");
-    expect(screen.getByText(/At 3 years/i)).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: "Focus overtime" }));
+    expect(screen.getByText("Overtime Survival")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Human Resources" }));
 
     await waitFor(() => {
-      expect(window.location.search).toContain("overTime=Yes");
-      expect(screen.getByText(/Current Overtime filter is Yes/i)).toBeInTheDocument();
+      expect(window.location.search).toContain("department=Human+Resources");
     });
 
-    await user.click(screen.getByRole("button", { name: "Compare groups" }));
+    await user.click(screen.getByRole("button", { name: "All" }));
 
     await waitFor(() => {
-      expect(window.location.search).not.toContain("overTime=Yes");
+      expect(window.location.search).not.toContain("department=Human+Resources");
     });
   });
 });
