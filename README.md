@@ -5,11 +5,13 @@ People analytics portfolio project using Kaplan-Meier survival curves, Cox propo
 **Live dashboard:** https://hr-attrition-dashboard.vercel.app  
 **Repository:** https://github.com/JoshuaColePhD/HR_Attrition_and_Survival_Analysis
 
+![Recruiter-friendly attrition risk driver chart](figures/recruiter_attrition_drivers.png)
+
+*Static README visual: adjusted hazard ratios from the Cox model. For interactive filtering and dashboard views, open the live dashboard linked above.*
+
 **Business question:** Where should HR and leadership intervene first to reduce preventable turnover, and when is intervention most likely to matter?
 
 **Headline finding:** Employees reporting overtime show approximately **3.1x higher adjusted attrition hazard** than employees not reporting overtime, after controlling for department and years since last promotion. In business terms, workload pressure is the strongest actionable retention signal in this analysis.
-
-![Cox Model Hazard Ratios for Attrition](figures/cox_forest_color.png)
 
 ## Executive Summary
 
@@ -36,7 +38,7 @@ Key results:
 
 ### Data
 
-- **Source:** IBM HR Analytics Employee Attrition dataset
+- **Source:** Public IBM HR Analytics Employee Attrition dataset included in `data/IBM-HR-Employee-Attrition.csv`
 - **Unit of analysis:** Employee
 - **Rows:** 1,470
 - **Observed attritions:** 237
@@ -55,7 +57,7 @@ Kaplan-Meier estimators are used to show retention over tenure:
 - Retention by overtime status
 - Retention by years-since-promotion band
 
-Log-rank tests support unadjusted group comparisons. The visual emphasis is on where curves separate and how many employees remain at risk, because those are the details HR leaders need for intervention timing.
+Log-rank p-values support unadjusted group comparisons. The generated plots emphasize where curves separate over tenure; the dashboard adds aggregate segment and survival views for leadership interpretation.
 
 Script: `R/02_survival_eda.R`
 
@@ -83,13 +85,13 @@ Recommended visuals for HR and leadership audiences:
 
 ## Dashboard
 
-The included Next.js dashboard turns the R analysis into an executive decision-support tool. It focuses on aggregate patterns and retention planning rather than employee-level prediction.
+The included Next.js dashboard turns the prepared analysis dataset and saved Cox model outputs into an executive decision-support tool. It focuses on aggregate patterns and retention planning rather than employee-level prediction.
 
 Open the live dashboard: https://hr-attrition-dashboard.vercel.app
 
 Dashboard features:
 
-- KPI summary for attrition, overtime exposure, median tenure, and model concordance
+- KPI summary for attrition, overtime exposure, organizational median tenure, and model concordance
 - Segment drilldowns by department, role family, overtime, tenure band, promotion band, travel, satisfaction, and work-life balance
 - Survival curves and concentration tables for non-technical interpretation
 - Cox model driver summaries with cautions
@@ -162,7 +164,7 @@ HR_Attrition/
 
 ## Custom HR Data
 
-The dashboard is portable but expects a stable prepared schema. A replacement dataset must map into these fields:
+The dashboard is portable but expects a stable prepared schema in `outputs/hr_survival_df.csv`. A replacement dataset must map into these fields:
 
 - `Age`
 - `Department`
@@ -175,6 +177,8 @@ The dashboard is portable but expects a stable prepared schema. A replacement da
 - `YearsSinceLastPromotion`
 - `event`
 - `time`
+
+The example mapper can derive `event` from `Attrition` and `time` from `YearsAtCompany` when those source columns are present.
 
 Use the mapping template:
 
