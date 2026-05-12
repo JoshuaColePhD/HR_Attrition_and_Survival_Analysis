@@ -69,7 +69,7 @@ describe("DashboardView", () => {
     const user = userEvent.setup();
     render(<DashboardView initialPayload={latestPayload} />);
 
-    await user.click(screen.getByRole("button", { name: "Sales" }));
+    await user.selectOptions(screen.getByLabelText("Department"), "Sales");
     await user.click(screen.getByRole("button", { name: "Risk Patterns" }));
 
     await waitFor(() => {
@@ -89,18 +89,18 @@ describe("DashboardView", () => {
     expect(screen.getByLabelText("Business Travel")).toBeInTheDocument();
   });
 
-  it("lets leaders filter the BI board with department buttons", async () => {
+  it("lets leaders filter the BI board with the horizontal department control", async () => {
     const user = userEvent.setup();
     render(<DashboardView initialPayload={latestPayload} />);
 
     expect(screen.getByText("Overtime Survival")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Human Resources" }));
+    await user.selectOptions(screen.getByLabelText("Department"), "Human Resources");
 
     await waitFor(() => {
       expect(window.location.search).toContain("department=Human+Resources");
     });
 
-    await user.click(screen.getByRole("button", { name: "All" }));
+    await user.selectOptions(screen.getByLabelText("Department"), "all");
 
     await waitFor(() => {
       expect(window.location.search).not.toContain("department=Human+Resources");

@@ -128,27 +128,17 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
   const activeFilterCount = countActiveFilters(filters);
   const primaryDefinitions = payload.filterDefinitions.filter((definition) => primaryFilterKeys.includes(definition.key));
   const advancedDefinitions = payload.filterDefinitions.filter((definition) => !primaryFilterKeys.includes(definition.key));
-  const departmentDefinition = payload.filterDefinitions.find((definition) => definition.key === "department");
-  const filterPanel = (
-    <FilterPanel
-      activeFilterCount={activeFilterCount}
-      showMoreFilters={showMoreFilters}
-      onToggleMore={() => setShowMoreFilters((current) => !current)}
-      onReset={() => setFilters(payload.filters)}
-      primaryDefinitions={primaryDefinitions}
-      advancedDefinitions={advancedDefinitions}
-      filters={filters}
-      onChange={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
-    />
-  );
   const compactDashboardHeader = (subtitle: string) => (
-    <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+    <div className="mb-4">
       <div>
         <h2 className="text-2xl font-semibold uppercase tracking-[0.02em] text-[#48a8ff] md:text-3xl">
           HR Analytics Dashboard
         </h2>
         <p className="mt-1 max-w-2xl text-sm text-sand/85">{subtitle}</p>
-        <div className="mt-3 flex flex-wrap gap-2">
+      </div>
+
+      <div className="mt-3 flex flex-col gap-3 xl:flex-row xl:items-end">
+        <div className="flex shrink-0 flex-wrap gap-2">
           {[
             { id: "summary" as DashboardTab, label: "Summary" },
             { id: "risk-patterns" as DashboardTab, label: "Risk Patterns" },
@@ -160,7 +150,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
               aria-label={tab.label}
               aria-pressed={selectedTab === tab.id}
               onClick={() => setSelectedTab(tab.id)}
-              className={`rounded-[2px] border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] transition ${
+              className={`min-h-9 rounded-[2px] border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] transition ${
                 selectedTab === tab.id
                   ? "border-[#4aa8ff] bg-[#1477c8] text-white"
                   : "border-[#4d8abb] bg-[#10385f] text-sand hover:border-[#7bbdff]"
@@ -170,23 +160,54 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
             </button>
           ))}
         </div>
-      </div>
-      <div className="grid gap-2 sm:grid-cols-2 lg:flex lg:flex-wrap lg:justify-end">
-        {departmentDefinition?.options.map((option) => (
+
+        <div className="flex min-w-0 flex-1 flex-wrap items-end gap-2 xl:justify-end">
+          {primaryDefinitions.map((definition) => (
+            <label key={definition.key} className="min-w-[126px] flex-1 sm:max-w-[170px] xl:flex-none">
+              <span className="mb-1 block text-[9px] font-semibold uppercase tracking-[0.14em] text-gold">
+                {definition.label}
+              </span>
+              <select
+                aria-label={definition.label}
+                className="h-9 w-full rounded-[2px] border border-[#4d8abb] bg-[#10385f] px-2 text-xs font-semibold text-sand outline-none transition focus:border-[#7bbdff]"
+                value={filters[definition.key]}
+                onChange={(event) => setFilters((current) => ({ ...current, [definition.key]: event.target.value }))}
+              >
+                {definition.options.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ))}
+
           <button
-            key={option.value}
             type="button"
-            onClick={() => setFilters((current) => ({ ...current, department: option.value }))}
-            className={`min-h-9 min-w-0 rounded-[2px] border px-4 py-2 text-xs font-semibold transition ${
-              filters.department === option.value
-                ? "border-[#4aa8ff] bg-[#1477c8] text-white"
-                : "border-[#4d8abb] bg-[#10385f] text-sand hover:border-[#7bbdff]"
-            }`}
+            onClick={() => setShowMoreFilters((current) => !current)}
+            className="h-9 rounded-[2px] border border-[#4d8abb] bg-[#10385f] px-3 text-xs font-semibold text-sand transition hover:border-[#7bbdff]"
           >
-            {option.label}
+            {showMoreFilters ? "Fewer filters" : `More filters${activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}`}
           </button>
-        ))}
+          <button
+            type="button"
+            onClick={() => setFilters(payload.filters)}
+            className="h-9 rounded-[2px] border border-gold/60 bg-gold px-3 text-xs font-semibold text-[#071321] transition hover:bg-[#ffd977]"
+          >
+            Reset
+          </button>
+        </div>
       </div>
+
+      {showMoreFilters ? (
+        <div className="mt-3 rounded-[3px] border border-[#37577b] bg-[#0b1f35]/75 p-3">
+          <FilterBar
+            definitions={advancedDefinitions}
+            filters={filters}
+            onChange={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
+          />
+        </div>
+      ) : null}
     </div>
   );
 
@@ -317,9 +338,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
             {compactDashboardHeader(
               "Descriptive patterns update with the global filters and help show where observed attrition is concentrated.",
             )}
-            <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
-              {filterPanel}
-              <div className={riskSurfaceClass}>
+            <div className={riskSurfaceClass}>
                 <div className="grid min-w-0 gap-4 xl:grid-cols-2">
                   <Panel title="Highest attrition segments" subtitle="Ranked by observed attrition rate in the selected population.">
                     <div className="h-[250px] sm:h-[290px]">
@@ -423,7 +442,6 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                     <CompactTable rows={concentrationRows} />
                   </Panel>
                 </div>
-              </div>
             </div>
           </section>
         ) : null}
@@ -431,9 +449,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
         {selectedTab === "model-scenarios" ? (
           <section aria-label="Model and Scenarios tab" className={dashboardShellClass}>
             {compactDashboardHeader(payload.notes.modelCaution)}
-            <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
-              {filterPanel}
-              <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]">
+            <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]">
                 <div className={modelSurfaceClass}>
                   <p className="text-xs uppercase tracking-[0.24em] text-ocean">Model + Scenarios</p>
                   <div className="mt-1 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
@@ -513,7 +529,6 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   </div>
                   {selectedScenarioDetails ? <ScenarioPanel scenario={selectedScenarioDetails} /> : null}
                 </div>
-              </div>
             </div>
           </section>
         ) : null}
