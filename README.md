@@ -1,64 +1,79 @@
 # HR Attrition and Survival Analysis
 
-People analytics portfolio project using survival analysis and an executive BI dashboard to identify when attrition risk accelerates, which workforce conditions are associated with that risk, and where HR should intervene first.
+Most organizations learn about attrition too late.
+
+By the time an exit interview happens, the decision has already been made, the replacement cost is already real, and leaders are left trying to explain a resignation after the window for intervention has closed. Traditional attrition models often reinforce that problem because they ask a narrow question: did this employee leave, yes or no?
+
+This project asks a more useful question for HR leaders:
+
+**When does attrition risk begin to build, and which working conditions make that risk accelerate?**
+
+To answer it, I treated attrition as a time-to-event problem using survival analysis, then translated the results into an executive dashboard designed for workforce planning and retention decisions.
 
 **Live dashboard:** https://hr-attrition-dashboard.vercel.app  
 **Repository:** https://github.com/JoshuaColePhD/HR_Attrition_and_Survival_Analysis
 
 [![Attrition risk driver chart](figures/attrition_risk_drivers_clean.png)](https://hr-attrition-dashboard.vercel.app)
 
-*Static README visual: adjusted hazard ratios from the Cox proportional hazards model. Open the live dashboard for interactive filters, KPI views, survival curves, and scenario framing.*
+*Adjusted hazard ratios from the Cox proportional hazards model. Open the live dashboard for interactive filters, KPI views, survival curves, and scenario framing.*
 
-## Executive Summary
+## The Story
 
-Most attrition models answer a limited question: did an employee leave or not? This project treats attrition as a time-to-event problem instead, preserving tenure information for employees who have not yet left and showing when risk accumulates.
+Imagine an HR leader looking at annual attrition and seeing a familiar number: 16.1% of employees left. That number matters, but it arrives as a summary of damage already done. It does not say when risk started rising, which employees were still being retained, or which conditions were most closely tied to exits.
 
-The headline finding is clear: **employees reporting overtime show about 3.1x higher adjusted attrition hazard** than employees not reporting overtime, after controlling for department and years since last promotion. In business terms, workload pressure is the strongest actionable retention signal in this analysis.
+That is the blind spot this project is built around.
 
-| Finding | Evidence | Business implication |
+A simple classification model would label employees as either "left" or "stayed." But employees who have not left are not failed data points. They are right-censored observations: people who have remained with the organization up to the point we observe them. Their tenure still carries information.
+
+Survival analysis keeps that information. Kaplan-Meier curves show where retention begins to separate over tenure. Cox proportional hazards regression estimates which workplace conditions are associated with faster attrition, while still accounting for employees who have not exited.
+
+The result is not just a model. It is a clearer retention question:
+
+**Where should leadership intervene before risk becomes resignation?**
+
+## What the Analysis Found
+
+The clearest signal in this dataset is workload pressure.
+
+Employees reporting overtime show about **3.1x higher adjusted attrition hazard** than employees not reporting overtime, after controlling for department and years since last promotion. In business terms, overtime is not just a descriptive HR metric here. It is the strongest actionable warning signal in the model.
+
+| Finding | Evidence | What it means for leaders |
 | --- | ---: | --- |
-| Overtime is the dominant modeled risk factor | HR = 3.07, 95% CI 2.38-3.97 | Prioritize workload redesign, staffing coverage, manager escalation paths, and burnout prevention. |
+| Overtime is the dominant modeled risk factor | HR = 3.07, 95% CI 2.38-3.97 | Start with workload design, staffing coverage, manager escalation paths, and burnout prevention. |
 | Promotion timing is associated with lower observed hazard | HR = 0.87 per year, 95% CI 0.83-0.91 | Use as a career mobility review signal, not as proof that delaying promotion reduces attrition. |
 | Department effects are not statistically clear after adjustment | Sales HR = 1.30, 95% CI 0.71-2.39 | Monitor departments, but investigate local work conditions before treating department as the cause. |
-| Model discrimination is portfolio-ready | C-index = 0.74 | Useful for aggregate workforce planning and executive discussion. |
+| Model discrimination is strong enough for portfolio planning | C-index = 0.74 | Useful for aggregate workforce planning and executive discussion. |
 
 Full model output and diagnostics are saved in `figures/cox_summary.txt` and `figures/cox_ph_test.txt`.
 
-## Business Question
+## From Finding to Action
 
-Where should HR and leadership intervene first to reduce preventable turnover, and when is intervention most likely to matter?
+The practical value of this analysis is not that it identifies a single magic variable. It gives HR a sequence for decision-making.
 
-This project answers that question with:
+1. **Find concentrated overtime exposure.** Start with teams and segments where overtime is structurally high, especially where retention curves separate early.
+2. **Intervene before the exit window opens.** Use tenure patterns to schedule workload and career conversations before attrition accelerates.
+3. **Translate risk into a business case.** Estimate expected attritions avoided and multiply by role-specific replacement cost assumptions, commonly 50%-200% of salary depending on role criticality.
+4. **Use department as a diagnostic lens.** Department-level differences should trigger investigation of work design, manager capacity, travel burden, and growth access.
+5. **Keep the analysis aggregate and ethical.** This project is designed for workforce planning and support, not individual surveillance or automated employment decisions.
 
-- Kaplan-Meier survival curves to show when retention curves separate
-- Cox proportional hazards regression to estimate adjusted attrition drivers
-- Dashboard views that translate statistical results into executive planning actions
-- Scenario framing for retention ROI, avoided replacement cost, and intervention prioritization
+## The Dashboard
 
-## Recommended Actions
-
-1. **Reduce concentrated overtime exposure.** Start with teams where overtime is high and attrition curves separate early. Review staffing ratios, scheduling practices, role overload, and manager escalation norms.
-2. **Intervene before risk becomes exit behavior.** Use survival curves to identify tenure windows where attrition accelerates, then schedule workload and career check-ins before those windows.
-3. **Frame retention ROI in avoided replacement cost.** For each priority segment, estimate expected attritions avoided and multiply by replacement cost assumptions, commonly 50%-200% of salary depending on role criticality.
-4. **Use department as a monitoring lens, not a causal explanation.** Department-level differences should trigger diagnosis of local work design, manager capacity, travel burden, and growth access.
-5. **Keep outputs aggregate and ethical.** This project is designed for workforce planning and support, not individual surveillance or automated employment decisions.
-
-## Dashboard
-
-The included Next.js dashboard turns the prepared analysis dataset and saved model outputs into an executive decision-support tool. It is designed for HR leaders and recruiters to quickly understand the business story, not just inspect statistical output.
+The dashboard turns the analysis into an executive decision-support tool. The goal is to help a leader understand the retention story quickly: where risk is concentrated, what conditions are associated with higher attrition, and what action would be most defensible.
 
 **Open the live dashboard:** https://hr-attrition-dashboard.vercel.app
 
 Dashboard features:
 
-- Compact KPI strip for attrition, overtime exposure, median tenure, and model concordance
-- Department, role family, overtime, tenure band, promotion band, travel, satisfaction, and work-life balance filters
-- Survival curves and concentration tables for non-technical interpretation
-- Cox model driver summaries with clear caveats
-- Scenario panel for retention planning and directional pressure reduction
-- Reusable dashboard presentation components in `components/dashboard-kit.tsx`
+- KPI strip for attrition, overtime exposure, median tenure, and model concordance
+- Filters for department, role family, overtime, tenure band, promotion band, travel, satisfaction, and work-life balance
+- Survival curves that show when risk accumulates
+- Segment tables that highlight concentrated attrition hotspots
+- Cox model summaries with plain-language cautions
+- Scenario framing for retention planning and directional pressure reduction
 
-## Methods
+The dashboard styling has also been extracted into `components/dashboard-kit.tsx` so the same executive BI look can be reused in future analytics projects.
+
+## Methodology
 
 ### Data
 
@@ -73,7 +88,7 @@ Dashboard features:
 | Time variable | `YearsAtCompany` |
 | Event variable | `Attrition` converted to `event`, where 1 = attrition and 0 = censored |
 
-Employees with `YearsAtCompany == 0` are retained as first-year employees so early-tenure risk is not removed from the business story.
+Employees with `YearsAtCompany == 0` are retained as first-year employees so early-tenure risk is not removed from the analysis.
 
 ### Survival EDA
 
