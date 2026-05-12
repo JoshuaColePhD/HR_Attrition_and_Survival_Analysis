@@ -241,10 +241,16 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
             </div>
 
             <div className="grid min-w-0 gap-4 xl:grid-cols-3">
-              <Panel title="Attrition by Department" subtitle="Observed attritions by department.">
+              <Panel title="Attrition by Department" subtitle="Observed exits by department. Hover for rate and headcount.">
                 <div className={summaryChartClass}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
+                      <text x="50%" y="45%" textAnchor="middle" fill="#F8FAFC" fontSize={28} fontWeight={700}>
+                        {payload.summary.filteredAttritions}
+                      </text>
+                      <text x="50%" y="54%" textAnchor="middle" fill="#B8C4D6" fontSize={13} fontWeight={600}>
+                        observed exits
+                      </text>
                       <Pie
                         data={departmentSegments}
                         dataKey="attritions"
@@ -257,8 +263,13 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                           <Cell key={segment.segment} fill={chartColors[index % chartColors.length]} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value: number) => `${value} attritions`} />
-                      <Legend />
+                      <Tooltip content={<DepartmentPieTooltip totalAttritions={payload.summary.filteredAttritions} />} />
+                      <Legend
+                        formatter={(value) => {
+                          const segment = departmentSegments.find((item) => item.segment === value);
+                          return segment ? `${value} (${segment.attritions})` : value;
+                        }}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
@@ -918,6 +929,38 @@ function Panel({ title, subtitle, children }: { title: string; subtitle: string;
       </div>
       {children}
     </section>
+  );
+}
+
+function DepartmentPieTooltip({
+  active,
+  payload,
+  totalAttritions,
+}: {
+  active?: boolean;
+  payload?: Array<{ color?: string; payload?: SegmentMetric }>;
+  totalAttritions: number;
+}) {
+  const segment = payload?.[0]?.payload;
+
+  if (!active || !segment) {
+    return null;
+  }
+
+  return (
+    <div className="max-w-[240px] rounded-[6px] border border-[#5f82aa] bg-[#081a2c] px-4 py-3 text-sm text-ink shadow-soft">
+      <p className="font-semibold text-white">{segment.segment}</p>
+      <div className="mt-2 space-y-1 text-sand/85">
+        <p>
+          <span className="font-semibold text-white">{segment.attritions}</span> exits (
+          {toPercentFromMetric(segment.attritions, totalAttritions)}% of observed exits)
+        </p>
+        <p>
+          <span className="font-semibold text-white">{segment.attritionRate}%</span> attrition rate
+        </p>
+        <p>{segment.employees} employees in selected scope</p>
+      </div>
+    </div>
   );
 }
 
