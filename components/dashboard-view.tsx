@@ -367,7 +367,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   >
                     <div className="h-[250px] sm:h-[290px]">
                       <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={topSegments} margin={{ top: 10, right: 14, bottom: 4, left: 0 }}>
+                        <AreaChart data={topSegments} margin={{ top: 10, right: 14, bottom: 4, left: 8 }}>
                           <defs>
                             <linearGradient id="mixFill" x1="0" y1="0" x2="0" y2="1">
                               <stop offset="5%" stopColor="#5BC0EB" stopOpacity={0.35} />
@@ -384,7 +384,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                             height={64}
                             tickFormatter={formatShortSegmentLabel}
                           />
-                          <YAxis tickFormatter={(value) => `${value}%`} width={34} />
+                          <YAxis tickFormatter={(value) => `${value}%`} width={42} />
                           <Tooltip formatter={(value: number) => `${value}%`} />
                           <Area type="monotone" dataKey="shareOfPopulation" stroke="#5BC0EB" fill="url(#mixFill)" />
                         </AreaChart>
@@ -414,10 +414,10 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                     </div>
                     <div className="h-[250px] sm:h-[290px]">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={mergeSurvivalSeries(selectedSurvivalSeries)} margin={{ top: 10, right: 12, bottom: 28, left: 0 }}>
+                        <LineChart data={mergeSurvivalSeries(selectedSurvivalSeries)} margin={{ top: 10, right: 12, bottom: 28, left: 8 }}>
                           <CartesianGrid stroke="#274766" />
                           <XAxis dataKey="tenure" label={{ value: "Years at company", position: "insideBottom", offset: -4 }} />
-                          <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} width={38} />
+                          <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} width={46} />
                           <Tooltip formatter={(value: number) => `${value}%`} />
                           <Legend verticalAlign="bottom" height={28} />
                           {selectedSurvivalSeries.map((series, index) => (
