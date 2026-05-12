@@ -317,10 +317,10 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
               <Panel title="Attrition by Job Role" subtitle="Job families with the highest observed rates.">
                 <div className={summaryChartClass}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={jobRoleSegments} layout="vertical" margin={{ top: 10, right: 48, bottom: 10, left: 86 }}>
+                    <BarChart data={jobRoleSegments} layout="vertical" margin={{ top: 10, right: 54, bottom: 10, left: 4 }}>
                       <CartesianGrid stroke="#2b6687" horizontal={false} />
                       <XAxis type="number" domain={[0, 32]} tickFormatter={(value) => `${value}%`} />
-                      <YAxis type="category" dataKey="segment" width={122} tick={{ fill: "#F8FAFC", fontSize: 11 }} />
+                      <YAxis type="category" dataKey="segment" width={106} tick={{ fill: "#F8FAFC", fontSize: 11 }} />
                       <Tooltip formatter={(value: number) => `${value}%`} />
                       <Bar dataKey="attritionRate" fill="#168ef2" radius={[0, 4, 4, 0]}>
                         <LabelList dataKey="attritionRate" position="right" formatter={(value: number) => `${value}%`} />
