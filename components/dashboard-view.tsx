@@ -296,10 +296,10 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
               <Panel title="Attrition by Segment" subtitle="Highest observed segment rates.">
                 <div className={summaryChartClass}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={summarySegments} layout="vertical" margin={{ top: 10, right: 46, bottom: 10, left: 68 }}>
+                    <BarChart data={summarySegments} layout="vertical" margin={{ top: 10, right: 54, bottom: 10, left: 4 }}>
                       <CartesianGrid stroke="#2b6687" horizontal={false} />
                       <XAxis type="number" domain={[0, 40]} tickFormatter={(value) => `${value}%`} />
-                      <YAxis type="category" dataKey="segment" width={104} tick={{ fill: "#F8FAFC", fontSize: 11 }} />
+                      <YAxis type="category" dataKey="segment" width={116} tick={{ fill: "#F8FAFC", fontSize: 11 }} />
                       <Tooltip formatter={(value: number) => `${value}%`} />
                       <Bar dataKey="attritionRate" fill="#168ef2" radius={[0, 4, 4, 0]}>
                         <LabelList dataKey="attritionRate" position="right" formatter={(value: number) => `${value}%`} />
