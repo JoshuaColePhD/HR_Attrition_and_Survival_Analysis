@@ -22,12 +22,18 @@ import {
 import {
   DashboardFilters,
   DashboardPayload,
-  FilterDefinition,
   FilterKey,
   ScenarioDefinition,
   SegmentMetric,
   SurvivalSeries,
 } from "@/lib/types";
+import {
+  CompactTable,
+  DashboardHeader,
+  DashboardShell,
+  KpiCard,
+  Panel,
+} from "@/components/dashboard-kit";
 
 type DashboardViewProps = {
   initialPayload: DashboardPayload;
@@ -40,10 +46,12 @@ const surfaceClass =
   "w-full max-w-full min-w-0 rounded-[3px] border border-[#37577b] bg-[#132a46]/92 p-4 shadow-soft md:p-5";
 const chartColors = ["#5BC0EB", "#F4727A", "#F6C85F", "#9B7EDE", "#4E79A7"];
 const primaryFilterKeys: FilterKey[] = ["department", "jobRoleFamily", "overTime", "tenureBand"];
-const dashboardShellClass =
-  "overflow-hidden rounded-[3px] border border-[#42658d] bg-[radial-gradient(circle_at_25%_45%,rgba(23,146,161,0.35),transparent_28rem),linear-gradient(135deg,#05345a_0%,#07556a_48%,#08203b_100%)] p-4 shadow-soft";
+const dashboardTabs: Array<{ id: DashboardTab; label: string }> = [
+  { id: "summary", label: "Summary" },
+  { id: "risk-patterns", label: "Risk Patterns" },
+  { id: "model-scenarios", label: "Model + Scenarios" },
+];
 const summaryChartClass = "min-h-[250px] min-w-0 flex-1";
-const summarySurfaceClass = `${surfaceClass}`;
 const riskSurfaceClass = `${surfaceClass}`;
 const modelSurfaceClass = `${surfaceClass}`;
 
@@ -129,93 +137,28 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
   const primaryDefinitions = payload.filterDefinitions.filter((definition) => primaryFilterKeys.includes(definition.key));
   const advancedDefinitions = payload.filterDefinitions.filter((definition) => !primaryFilterKeys.includes(definition.key));
   const compactDashboardHeader = (subtitle: string) => (
-    <div className="mb-4">
-      <div>
-        <h2 className="text-2xl font-semibold uppercase tracking-[0.02em] text-[#48a8ff] md:text-3xl">
-          HR Analytics Dashboard
-        </h2>
-        <p className="mt-1 max-w-2xl text-sm text-sand/85">{subtitle}</p>
-      </div>
-
-      <div className="mt-3 flex flex-col gap-3 xl:flex-row xl:items-end">
-        <div className="flex shrink-0 flex-wrap gap-2">
-          {[
-            { id: "summary" as DashboardTab, label: "Summary" },
-            { id: "risk-patterns" as DashboardTab, label: "Risk Patterns" },
-            { id: "model-scenarios" as DashboardTab, label: "Model + Scenarios" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              aria-label={tab.label}
-              aria-pressed={selectedTab === tab.id}
-              onClick={() => setSelectedTab(tab.id)}
-              className={`min-h-9 rounded-[2px] border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] transition ${
-                selectedTab === tab.id
-                  ? "border-[#4aa8ff] bg-[#1477c8] text-white"
-                  : "border-[#4d8abb] bg-[#10385f] text-sand hover:border-[#7bbdff]"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex min-w-0 flex-1 flex-wrap items-end gap-2 xl:justify-end">
-          {primaryDefinitions.map((definition) => (
-            <label key={definition.key} className="min-w-[126px] flex-1 sm:max-w-[170px] xl:flex-none">
-              <span className="mb-1 block text-[9px] font-semibold uppercase tracking-[0.14em] text-gold">
-                {definition.label}
-              </span>
-              <select
-                aria-label={definition.label}
-                className="h-9 w-full rounded-[2px] border border-[#4d8abb] bg-[#10385f] px-2 text-xs font-semibold text-sand outline-none transition focus:border-[#7bbdff]"
-                value={filters[definition.key]}
-                onChange={(event) => setFilters((current) => ({ ...current, [definition.key]: event.target.value }))}
-              >
-                {definition.options.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ))}
-
-          <button
-            type="button"
-            onClick={() => setShowMoreFilters((current) => !current)}
-            className="h-9 rounded-[2px] border border-[#4d8abb] bg-[#10385f] px-3 text-xs font-semibold text-sand transition hover:border-[#7bbdff]"
-          >
-            {showMoreFilters ? "Fewer filters" : `More filters${activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}`}
-          </button>
-          <button
-            type="button"
-            onClick={() => setFilters(payload.filters)}
-            className="h-9 rounded-[2px] border border-gold/60 bg-gold px-3 text-xs font-semibold text-[#071321] transition hover:bg-[#ffd977]"
-          >
-            Reset
-          </button>
-        </div>
-      </div>
-
-      {showMoreFilters ? (
-        <div className="mt-3 rounded-[3px] border border-[#37577b] bg-[#0b1f35]/75 p-3">
-          <FilterBar
-            definitions={advancedDefinitions}
-            filters={filters}
-            onChange={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
-          />
-        </div>
-      ) : null}
-    </div>
+    <DashboardHeader
+      title="HR Analytics Dashboard"
+      subtitle={subtitle}
+      selectedTab={selectedTab}
+      tabs={dashboardTabs}
+      filters={filters}
+      primaryFilters={primaryDefinitions}
+      advancedFilters={advancedDefinitions}
+      showMoreFilters={showMoreFilters}
+      activeFilterCount={activeFilterCount}
+      onTabChange={setSelectedTab}
+      onFilterChange={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
+      onToggleMoreFilters={() => setShowMoreFilters((current) => !current)}
+      onResetFilters={() => setFilters(payload.filters)}
+    />
   );
 
   return (
     <main className="min-h-screen overflow-x-hidden px-3 py-4 md:px-7 md:py-6">
       <div className="mx-auto w-full max-w-7xl min-w-0">
         {selectedTab === "summary" ? (
-          <section aria-label="Summary tab" className={dashboardShellClass}>
+          <DashboardShell label="Summary tab">
             {compactDashboardHeader(payload.recommendations.summary)}
 
             <div className="mb-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
@@ -341,11 +284,11 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                 </div>
               </Panel>
             </div>
-          </section>
+          </DashboardShell>
         ) : null}
 
         {selectedTab === "risk-patterns" ? (
-          <section aria-label="Risk Patterns tab" className={dashboardShellClass}>
+          <DashboardShell label="Risk Patterns tab">
             {compactDashboardHeader(
               "Descriptive patterns update with the global filters and help show where observed attrition is concentrated.",
             )}
@@ -454,11 +397,11 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   </Panel>
                 </div>
             </div>
-          </section>
+          </DashboardShell>
         ) : null}
 
         {selectedTab === "model-scenarios" ? (
-          <section aria-label="Model and Scenarios tab" className={dashboardShellClass}>
+          <DashboardShell label="Model and Scenarios tab">
             {compactDashboardHeader(payload.notes.modelCaution)}
             <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]">
                 <div className={modelSurfaceClass}>
@@ -541,7 +484,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   {selectedScenarioDetails ? <ScenarioPanel scenario={selectedScenarioDetails} /> : null}
                 </div>
             </div>
-          </section>
+          </DashboardShell>
         ) : null}
       </div>
     </main>
@@ -583,179 +526,6 @@ function formatShortDriverLabel(value: string) {
   if (value.includes("Overtime")) return "Overtime";
   if (value.includes("Promotion")) return "Promotion";
   return value.length > 12 ? `${value.slice(0, 10)}...` : value;
-}
-
-function formatGeneratedDate(value: string) {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat("en-US", {
-    month: "numeric",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(parsed);
-}
-
-function ContextBar({
-  employees,
-  attritions,
-  activeFilterCount,
-  generatedAt,
-  modelConcordance,
-}: {
-  employees: number;
-  attritions: number;
-  activeFilterCount: number;
-  generatedAt: string;
-  modelConcordance: number;
-}) {
-  const items = [
-    { label: "Selected population", value: `${employees} employees` },
-    { label: "Observed attritions", value: `${attritions}` },
-    { label: "Filters active", value: activeFilterCount === 0 ? "None" : `${activeFilterCount}` },
-    { label: "Generated", value: formatGeneratedDate(generatedAt) },
-    { label: "Model C-index", value: modelConcordance.toFixed(2) },
-  ];
-
-  return (
-    <div className="mb-3 grid min-w-0 gap-0 border-x border-b border-[#42658d] bg-[#102846] shadow-soft md:mb-4 md:grid-cols-5">
-      {items.map((item) => (
-        <div key={item.label} className="min-w-0 border-b border-[#37577b] px-4 py-3 md:border-b-0 md:border-r last:md:border-r-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gold">{item.label}</p>
-          <p className="mt-1 break-words text-xl font-semibold text-white md:text-2xl">{item.value}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function TabBar({
-  selectedTab,
-  onChange,
-}: {
-  selectedTab: DashboardTab;
-  onChange: (tab: DashboardTab) => void;
-}) {
-  const tabs: Array<{ id: DashboardTab; label: string; shortLabel: string }> = [
-    { id: "summary", label: "Summary", shortLabel: "Summary" },
-    { id: "risk-patterns", label: "Risk Patterns", shortLabel: "Risks" },
-    { id: "model-scenarios", label: "Model + Scenarios", shortLabel: "Scenarios" },
-  ];
-
-  return (
-    <nav aria-label="Dashboard tabs" className="rounded-[3px] border border-[#42658d] bg-[#102846] p-1 shadow-soft">
-      <div className="grid grid-cols-3 gap-1">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            aria-label={tab.label}
-            aria-pressed={selectedTab === tab.id}
-            onClick={() => onChange(tab.id)}
-            className={`min-h-10 min-w-0 rounded-[4px] px-1.5 py-2 text-xs font-semibold leading-tight transition md:px-4 md:py-2.5 md:text-sm ${
-              selectedTab === tab.id
-                ? tab.id === "summary"
-                  ? "bg-slateblue text-white"
-                  : tab.id === "risk-patterns"
-                    ? "bg-ember text-[#071321]"
-                    : "bg-ocean text-[#071321]"
-                : "text-sand hover:bg-[#19385c] hover:text-white"
-            }`}
-          >
-            <span aria-hidden="true" className="md:hidden">{tab.shortLabel}</span>
-            <span aria-hidden="true" className="hidden md:inline">{tab.label}</span>
-          </button>
-        ))}
-      </div>
-    </nav>
-  );
-}
-
-function FilterPanel({
-  activeFilterCount,
-  showMoreFilters,
-  onToggleMore,
-  onReset,
-  primaryDefinitions,
-  advancedDefinitions,
-  filters,
-  onChange,
-}: {
-  activeFilterCount: number;
-  showMoreFilters: boolean;
-  onToggleMore: () => void;
-  onReset: () => void;
-  primaryDefinitions: FilterDefinition[];
-  advancedDefinitions: FilterDefinition[];
-  filters: DashboardFilters;
-  onChange: (key: FilterKey, value: string) => void;
-}) {
-  return (
-    <aside className="min-w-0 rounded-[3px] border border-[#42658d] bg-[#0b1f35] p-4 text-white shadow-soft lg:sticky lg:top-[76px] lg:self-start">
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gold">Filter</p>
-        <p className="rounded-[3px] border border-gold/30 bg-gold/10 px-2 py-1 text-[11px] font-semibold text-gold">
-          {activeFilterCount === 0 ? "All" : `${activeFilterCount} active`}
-        </p>
-      </div>
-
-      <FilterBar definitions={primaryDefinitions} filters={filters} onChange={onChange} variant="rail" />
-
-      {showMoreFilters ? (
-        <div className="mt-4 border-t border-white/20 pt-4">
-          <FilterBar definitions={advancedDefinitions} filters={filters} onChange={onChange} variant="rail" />
-        </div>
-      ) : null}
-
-      <div className="mt-5 grid gap-2">
-        <button
-          type="button"
-          onClick={onToggleMore}
-          className="rounded-[3px] border border-[#5f82aa] bg-[#173c61] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#214d78]"
-        >
-          {showMoreFilters ? "Fewer filters" : "More filters"}
-        </button>
-        <button
-          type="button"
-          onClick={onReset}
-          className="rounded-[3px] border border-gold/50 bg-gold px-3 py-2 text-sm font-semibold text-[#071321] transition hover:bg-[#ffd977]"
-        >
-          Reset filters
-        </button>
-      </div>
-    </aside>
-  );
-}
-
-function KpiCard({
-  label,
-  value,
-  hint,
-  accent,
-}: {
-  label: string;
-  value: string | number;
-  hint: string;
-  accent: "pine" | "ember" | "gold" | "ocean" | "plum";
-}) {
-  const accentMap = {
-    pine: "border-t-ocean bg-[#0b1f35]",
-    ember: "border-t-ember bg-[#0b1f35]",
-    gold: "border-t-gold bg-[#0b1f35]",
-    ocean: "border-t-ocean bg-[#0b1f35]",
-    plum: "border-t-plum bg-[#0b1f35]",
-  } as const;
-
-  return (
-    <article className={`min-w-0 rounded-[3px] border border-[#37577b] border-t-4 px-4 py-3 md:py-4 ${accentMap[accent]}`}>
-      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold md:text-[11px]">{label}</p>
-      <p className="mt-2 break-words text-2xl font-semibold tracking-tight text-white md:text-[1.65rem]">{value}</p>
-      <p className="mt-1 break-words text-xs text-sand/75 md:text-sm">{hint}</p>
-    </article>
-  );
 }
 
 function OvertimeGapExplorer({
@@ -906,32 +676,6 @@ function GapMetric({ label, value, tone = "pine" }: { label: string; value: stri
   );
 }
 
-function InsightCard({ text, tone }: { text: string; tone: "pine" | "ember" | "ocean" }) {
-  const toneMap = {
-    pine: "border-[#37577b] bg-[#0b1f35]",
-    ember: "border-[#37577b] bg-[#0b1f35]",
-    ocean: "border-[#37577b] bg-[#0b1f35]",
-  } as const;
-
-  return (
-    <article className={`min-w-0 rounded-[6px] border p-4 ${toneMap[tone]}`}>
-      <p className="break-words text-sm leading-6 text-sand/90">{text}</p>
-    </article>
-  );
-}
-
-function Panel({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
-  return (
-    <section className="flex min-w-0 flex-col rounded-[8px] border border-[#37577b] bg-[#0b1f35] p-4 shadow-[0_8px_18px_rgba(17,24,39,0.04)] md:p-5">
-      <div className="mb-4 min-w-0 border-b border-[#26415f] pb-3">
-        <h3 className="text-lg font-semibold text-ink">{title}</h3>
-        <p className="mt-1 break-words text-sm text-sand/80">{subtitle}</p>
-      </div>
-      {children}
-    </section>
-  );
-}
-
 function DepartmentPieTooltip({
   active,
   payload,
@@ -961,118 +705,6 @@ function DepartmentPieTooltip({
         <p>{segment.employees} employees in selected scope</p>
       </div>
     </div>
-  );
-}
-
-function FilterBar({
-  definitions,
-  filters,
-  onChange,
-  variant = "default",
-}: {
-  definitions: FilterDefinition[];
-  filters: DashboardFilters;
-  onChange: (key: FilterKey, value: string) => void;
-  variant?: "default" | "rail";
-}) {
-  const isRail = variant === "rail";
-
-  return (
-    <div className={isRail ? "grid gap-4" : "grid gap-3 sm:grid-cols-2 xl:grid-cols-4"}>
-      {definitions.map((definition) => (
-        <label key={definition.key} className="block">
-          <span className={`mb-1 block text-[10px] font-semibold uppercase tracking-[0.16em] ${isRail ? "text-white/82" : "text-sand/60"}`}>
-            {definition.label}
-          </span>
-          <select
-            aria-label={definition.label}
-            className={`w-full rounded-[6px] border px-3 py-2.5 text-sm shadow-sm outline-none transition md:px-3 md:py-2.5 ${
-              isRail
-                ? "border-white/30 bg-[#0b1f35] text-ink focus:border-white"
-                : "border-[#37577b] bg-[#0b1f35] text-ink focus:border-pine"
-            }`}
-            value={filters[definition.key]}
-            onChange={(event) => onChange(definition.key, event.target.value)}
-          >
-            {definition.options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-      ))}
-    </div>
-  );
-}
-
-function CompactTable({ rows }: { rows: SegmentMetric[] }) {
-  return (
-    <div className="rounded-[8px] border border-[#37577b]">
-      <div className="divide-y divide-slate-100 sm:hidden">
-        {rows.map((row) => (
-          <article key={`${row.dimension}-${row.segment}`} className="p-4">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-sand/60">{row.dimension}</p>
-            <div className="mt-2 flex items-start justify-between gap-3">
-              <p className="min-w-0 break-words text-sm font-semibold text-ink">{row.segment}</p>
-              <p className="shrink-0 text-sm font-semibold text-ember">{row.attritionRate}%</p>
-            </div>
-            <p className="mt-2 text-xs text-sand/60">{row.attritions} attritions</p>
-          </article>
-        ))}
-      </div>
-
-      <div className="hidden overflow-x-auto sm:block">
-        <table className="min-w-full table-fixed border-collapse text-sm">
-          <thead className="bg-mist text-left text-[10px] uppercase tracking-[0.12em] text-sand/60">
-            <tr>
-              <th className="w-[26%] px-3 py-3">Dimension</th>
-              <th className="w-[31%] px-3 py-3">Segment</th>
-              <th className="w-[19%] px-3 py-3">Rate</th>
-              <th className="w-[24%] px-3 py-3">Attritions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={`${row.dimension}-${row.segment}`} className="border-t border-[#26415f]">
-                <td className="px-3 py-3 text-sand/60">{row.dimension}</td>
-                <td className="break-words px-3 py-3 font-medium text-ink">{row.segment}</td>
-                <td className="px-3 py-3 text-ember">{row.attritionRate}%</td>
-                <td className="px-3 py-3 text-ink">{row.attritions}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-function CompactListCard({
-  title,
-  items,
-  tone,
-}: {
-  title: string;
-  items: string[];
-  tone: "ember" | "ocean";
-}) {
-  const toneMap = {
-    ember: "border-[#37577b] bg-[#0b1f35]",
-    ocean: "border-[#37577b] bg-[#0b1f35]",
-  } as const;
-
-  return (
-    <section className={`min-w-0 rounded-[3px] border p-4 md:p-5 ${toneMap[tone]}`}>
-      <h3 className="text-base font-semibold text-ink">{title}</h3>
-      <ul className="mt-3 space-y-3 pl-5 text-sm leading-6 text-sand/90">
-        {items.map((item) => (
-          <li key={item} className="list-disc break-words">
-            {item}
-          </li>
-        ))}
-      </ul>
-    </section>
   );
 }
 
