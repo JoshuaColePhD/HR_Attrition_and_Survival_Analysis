@@ -42,6 +42,7 @@ const chartColors = ["#5BC0EB", "#F4727A", "#F6C85F", "#9B7EDE", "#4E79A7"];
 const primaryFilterKeys: FilterKey[] = ["department", "jobRoleFamily", "overTime", "tenureBand"];
 const dashboardShellClass =
   "overflow-hidden rounded-[3px] border border-[#42658d] bg-[radial-gradient(circle_at_25%_45%,rgba(23,146,161,0.35),transparent_28rem),linear-gradient(135deg,#05345a_0%,#07556a_48%,#08203b_100%)] p-4 shadow-soft";
+const summaryChartClass = "min-h-[250px] min-w-0 flex-1";
 const summarySurfaceClass = `${surfaceClass}`;
 const riskSurfaceClass = `${surfaceClass}`;
 const modelSurfaceClass = `${surfaceClass}`;
@@ -220,7 +221,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
 
             <div className="grid min-w-0 gap-4 xl:grid-cols-3">
               <Panel title="Attrition by Department" subtitle="Observed attritions by department.">
-                <div className="h-[230px]">
+                <div className={summaryChartClass}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -243,9 +244,9 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
               </Panel>
 
               <Panel title="Attrition by Year at Company" subtitle="Retention pattern across tenure.">
-                <div className="h-[230px]">
+                <div className={summaryChartClass}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={overallSurvivalRows}>
+                    <AreaChart data={overallSurvivalRows} margin={{ top: 8, right: 14, bottom: 8, left: 4 }}>
                       <CartesianGrid stroke="#2b6687" />
                       <XAxis dataKey="tenure" />
                       <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
@@ -261,11 +262,11 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
               </Panel>
 
               <Panel title="Attrition by Segment" subtitle="Highest observed segment rates.">
-                <div className="h-[230px]">
+                <div className={summaryChartClass}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={summarySegments} layout="vertical" margin={{ top: 8, right: 18, bottom: 8, left: 74 }}>
+                    <BarChart data={summarySegments} layout="vertical" margin={{ top: 10, right: 46, bottom: 10, left: 68 }}>
                       <CartesianGrid stroke="#2b6687" horizontal={false} />
-                      <XAxis type="number" tickFormatter={(value) => `${value}%`} />
+                      <XAxis type="number" domain={[0, 40]} tickFormatter={(value) => `${value}%`} />
                       <YAxis type="category" dataKey="segment" width={104} tick={{ fill: "#F8FAFC", fontSize: 11 }} />
                       <Tooltip formatter={(value: number) => `${value}%`} />
                       <Bar dataKey="attritionRate" fill="#168ef2" radius={[0, 4, 4, 0]}>
@@ -277,14 +278,14 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
               </Panel>
 
               <Panel title="Overtime Survival" subtitle="Retention by overtime status.">
-                <div className="h-[230px]">
+                <div className={summaryChartClass}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={overtimeGapRows}>
+                    <LineChart data={overtimeGapRows} margin={{ top: 8, right: 10, bottom: 22, left: 0 }}>
                       <CartesianGrid stroke="#2b6687" />
                       <XAxis dataKey="tenure" />
                       <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
                       <Tooltip formatter={(value: number) => `${value}% retained`} />
-                      <Legend />
+                      <Legend verticalAlign="bottom" height={24} />
                       <Line type="monotone" dataKey="No" name="No overtime" stroke="#43a7f5" dot={false} strokeWidth={2.4} />
                       <Line type="monotone" dataKey="Yes" name="Overtime" stroke="#b0a5d9" dot={false} strokeWidth={2.4} />
                     </LineChart>
@@ -293,11 +294,11 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
               </Panel>
 
               <Panel title="Attrition by Job Role" subtitle="Job families with the highest observed rates.">
-                <div className="h-[230px]">
+                <div className={summaryChartClass}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={jobRoleSegments} layout="vertical" margin={{ top: 8, right: 18, bottom: 8, left: 92 }}>
+                    <BarChart data={jobRoleSegments} layout="vertical" margin={{ top: 10, right: 48, bottom: 10, left: 86 }}>
                       <CartesianGrid stroke="#2b6687" horizontal={false} />
-                      <XAxis type="number" tickFormatter={(value) => `${value}%`} />
+                      <XAxis type="number" domain={[0, 32]} tickFormatter={(value) => `${value}%`} />
                       <YAxis type="category" dataKey="segment" width={122} tick={{ fill: "#F8FAFC", fontSize: 11 }} />
                       <Tooltip formatter={(value: number) => `${value}%`} />
                       <Bar dataKey="attritionRate" fill="#168ef2" radius={[0, 4, 4, 0]}>
@@ -323,9 +324,9 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   <Panel title="Highest attrition segments" subtitle="Ranked by observed attrition rate in the selected population.">
                     <div className="h-[250px] sm:h-[290px]">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={topSegments} layout="vertical" margin={{ top: 8, right: 18, bottom: 8, left: 42 }}>
+                        <BarChart data={topSegments} layout="vertical" margin={{ top: 10, right: 46, bottom: 10, left: 42 }}>
                           <CartesianGrid stroke="#274766" horizontal={false} />
-                          <XAxis type="number" tickFormatter={(value) => `${value}%`} />
+                          <XAxis type="number" domain={[0, 40]} tickFormatter={(value) => `${value}%`} />
                           <YAxis type="category" dataKey="segment" width={108} tick={{ fill: "#D7E4F7", fontSize: 12 }} />
                           <Tooltip formatter={(value: number) => `${value}%`} />
                           <Bar dataKey="attritionRate" radius={[0, 8, 8, 0]}>
@@ -347,7 +348,7 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                   >
                     <div className="h-[250px] sm:h-[290px]">
                       <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={topSegments}>
+                        <AreaChart data={topSegments} margin={{ top: 10, right: 14, bottom: 4, left: 0 }}>
                           <defs>
                             <linearGradient id="mixFill" x1="0" y1="0" x2="0" y2="1">
                               <stop offset="5%" stopColor="#5BC0EB" stopOpacity={0.35} />
@@ -394,12 +395,12 @@ export function DashboardView({ initialPayload }: DashboardViewProps) {
                     </div>
                     <div className="h-[250px] sm:h-[290px]">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={mergeSurvivalSeries(selectedSurvivalSeries)}>
+                        <LineChart data={mergeSurvivalSeries(selectedSurvivalSeries)} margin={{ top: 10, right: 12, bottom: 28, left: 0 }}>
                           <CartesianGrid stroke="#274766" />
                           <XAxis dataKey="tenure" label={{ value: "Years at company", position: "insideBottom", offset: -4 }} />
                           <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} width={38} />
                           <Tooltip formatter={(value: number) => `${value}%`} />
-                          <Legend />
+                          <Legend verticalAlign="bottom" height={28} />
                           {selectedSurvivalSeries.map((series, index) => (
                             <Line
                               key={series.name}
@@ -895,7 +896,7 @@ function InsightCard({ text, tone }: { text: string; tone: "pine" | "ember" | "o
 
 function Panel({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
   return (
-    <section className="min-w-0 rounded-[8px] border border-[#37577b] bg-[#0b1f35] p-4 shadow-[0_8px_18px_rgba(17,24,39,0.04)] md:p-5">
+    <section className="flex min-w-0 flex-col rounded-[8px] border border-[#37577b] bg-[#0b1f35] p-4 shadow-[0_8px_18px_rgba(17,24,39,0.04)] md:p-5">
       <div className="mb-4 min-w-0 border-b border-[#26415f] pb-3">
         <h3 className="text-lg font-semibold text-ink">{title}</h3>
         <p className="mt-1 break-words text-sm text-sand/80">{subtitle}</p>
@@ -964,22 +965,22 @@ function CompactTable({ rows }: { rows: SegmentMetric[] }) {
       </div>
 
       <div className="hidden overflow-x-auto sm:block">
-        <table className="min-w-full border-collapse text-sm">
-          <thead className="bg-mist text-left text-[11px] uppercase tracking-[0.18em] text-sand/60">
+        <table className="min-w-full table-fixed border-collapse text-sm">
+          <thead className="bg-mist text-left text-[10px] uppercase tracking-[0.12em] text-sand/60">
             <tr>
-              <th className="px-4 py-3">Dimension</th>
-              <th className="px-4 py-3">Segment</th>
-              <th className="px-4 py-3">Rate</th>
-              <th className="px-4 py-3">Attritions</th>
+              <th className="w-[26%] px-3 py-3">Dimension</th>
+              <th className="w-[31%] px-3 py-3">Segment</th>
+              <th className="w-[19%] px-3 py-3">Rate</th>
+              <th className="w-[24%] px-3 py-3">Attritions</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={`${row.dimension}-${row.segment}`} className="border-t border-[#26415f]">
-                <td className="px-4 py-3 text-sand/60">{row.dimension}</td>
-                <td className="px-4 py-3 font-medium text-ink">{row.segment}</td>
-                <td className="px-4 py-3 text-ember">{row.attritionRate}%</td>
-                <td className="px-4 py-3 text-ink">{row.attritions}</td>
+                <td className="px-3 py-3 text-sand/60">{row.dimension}</td>
+                <td className="break-words px-3 py-3 font-medium text-ink">{row.segment}</td>
+                <td className="px-3 py-3 text-ember">{row.attritionRate}%</td>
+                <td className="px-3 py-3 text-ink">{row.attritions}</td>
               </tr>
             ))}
           </tbody>
